@@ -32,7 +32,7 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
 
-public suspend fun Route.deployWsEventPublisher(
+public fun Route.deployWsEventPublisher(
     route: String = DEFAULT_EVENTS_ROUTE,
     channel: Channel<WsEvent<*>> = Channel(),
     eventReceivingScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
