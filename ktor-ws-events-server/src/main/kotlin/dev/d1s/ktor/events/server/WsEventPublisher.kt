@@ -16,14 +16,7 @@
 
 package dev.d1s.ktor.events.server
 
-import dev.d1s.ktor.events.commons.EventSource
 import dev.d1s.ktor.events.commons.WsEvent
 import kotlinx.coroutines.channels.SendChannel
 
-public suspend fun SendChannel<WsEvent<*>>.sendWsEvent(group: String, data: Any?, principal: String? = null) {
-    val source = EventSource(group, principal)
-
-    val event = WsEvent(source, data)
-
-    send(event)
-}
+public typealias WsEventPublisher = SendChannel<WsEvent<*>>

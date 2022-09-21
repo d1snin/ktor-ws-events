@@ -28,7 +28,6 @@ import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -36,7 +35,7 @@ public fun Route.deployWsEventPublisher(
     route: String = DEFAULT_EVENTS_ROUTE,
     channel: Channel<WsEvent<*>> = Channel(),
     eventReceivingScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-): SendChannel<WsEvent<*>> {
+): WsEventPublisher {
     require(route.contains(GROUP_SEGMENT_PLACEHOLDER)) {
         "Group segment ($GROUP_SEGMENT_PLACEHOLDER) placeholder must be present."
     }
