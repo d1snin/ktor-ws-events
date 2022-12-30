@@ -27,8 +27,11 @@ allprojects {
         plugin("org.jetbrains.kotlin.jvm")
     }
 
-    group = "dev.d1s"
-    version = "0.0.3"
+    val projectGroup: String by project
+    val projectVersion: String by project
+
+    group = projectGroup
+    version = projectVersion
 
     repositories {
         mavenCentral()
