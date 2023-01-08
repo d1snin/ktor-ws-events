@@ -22,7 +22,7 @@ dependencies {
 
 publishing {
     publications {
-        create<MavenPublication>("ktor-ws-events-commons") {
+        create<MavenPublication>(project.name) {
             from(components["java"])
         }
     }

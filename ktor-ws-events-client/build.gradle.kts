@@ -18,13 +18,14 @@ dependencies {
     val ktorVersion: String by project
 
     api(project(":ktor-ws-events-commons"))
+
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-websockets:$ktorVersion")
 }
 
 publishing {
     publications {
-        create<MavenPublication>("ktor-ws-events-client") {
+        create<MavenPublication>(project.name) {
             from(components["java"])
         }
     }
