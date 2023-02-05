@@ -31,6 +31,11 @@ allprojects {
     val projectGroup: String by project
     val projectVersion: String by project
 
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
     group = projectGroup
     version = projectVersion
 
@@ -44,7 +49,7 @@ allprojects {
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
-            jvmTarget = "11"
+            jvmTarget = JavaVersion.VERSION_17.majorVersion
         }
     }
 
