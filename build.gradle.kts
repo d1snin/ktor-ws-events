@@ -15,9 +15,10 @@
  */
 
 plugins {
+    kotlin("jvm")
     id("java-library")
     id("maven-publish")
-    kotlin("jvm")
+    id("com.github.ben-manes.versions")
 }
 
 allprojects {
