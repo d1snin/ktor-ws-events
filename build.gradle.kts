@@ -14,11 +14,25 @@
  * limitations under the License.
  */
 
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.dokka.base.DokkaBase
+import org.jetbrains.dokka.base.DokkaBaseConfiguration
+import org.jetbrains.dokka.gradle.DokkaTask
+
 plugins {
     kotlin("jvm")
     id("java-library")
     id("maven-publish")
+    id("org.jetbrains.dokka")
     id("com.github.ben-manes.versions")
+}
+
+buildscript {
+    dependencies {
+        val dokkaVersion: String by project
+
+        classpath("org.jetbrains.dokka:dokka-base:$dokkaVersion")
+    }
 }
 
 allprojects {
@@ -47,9 +61,23 @@ allprojects {
         implementation(kotlin("stdlib"))
     }
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    tasks.withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = JavaVersion.VERSION_17.majorVersion
+        }
+    }
+
+    tasks.withType<DokkaTask> {
+        dokkaSourceSets {
+            configureEach {
+                val moduleDocsPath: String by project
+
+                includes.setFrom(moduleDocsPath)
+            }
+        }
+
+        pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+            footerMessage = "Copyright (c) 2022-2023 Mikhail Titov"
         }
     }
 
