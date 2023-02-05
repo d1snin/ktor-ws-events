@@ -22,11 +22,3 @@ dependencies {
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     api("io.ktor:ktor-server-websockets:$ktorVersion")
 }
-
-publishing {
-    publications {
-        create<MavenPublication>(project.name) {
-            from(components["java"])
-        }
-    }
-}
