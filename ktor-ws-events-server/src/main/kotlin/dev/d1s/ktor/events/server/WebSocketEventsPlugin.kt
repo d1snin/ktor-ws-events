@@ -19,14 +19,41 @@ package dev.d1s.ktor.events.server
 import io.ktor.server.application.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 
 internal const val WEBSOCKET_EVENTS_PLUGIN_NAME = "websocket-events"
 
+/**
+ * Enables support for event streaming over WebSockets.
+ * Supposed to be used in pair with [webSocketEvents] route builder.
+ * Once the plugin is installed, it will fire a job listening for events
+ * in the provided [WebSocketEventsConfiguration.channel].
+ *
+ * Example usage:
+ * ```kotlin
+ * val eventChannel = WebSocketEventChannel()
+ *
+ * install(WebSocketEvents) {
+ *     channel = eventChannel
+ * }
+ *
+ * routing {
+ *     webSockets()
+ * }
+ *
+ * val createdBook = createBook()
+ * val reference = ref("book_created")
+ * val event = event(reference, createdBook)
+ *
+ * eventChannel.send(event)
+ * ```
+ * @see webSocketEvents
+ * @see WebSocketEventChannel
+ * @see WebSocketEventsConfiguration
+ */
 public val WebSocketEvents: ApplicationPlugin<WebSocketEventsConfiguration> =
     createApplicationPlugin(WEBSOCKET_EVENTS_PLUGIN_NAME, ::WebSocketEventsConfiguration) {
-        val channel = pluginConfig.channel
         val eventReceivingScope = pluginConfig.eventReceivingScope
+        val channel = pluginConfig.requiredChannel
 
         val webSocketEventConsumer = webSocketEventConsumer()
 
@@ -37,11 +64,13 @@ public val WebSocketEvents: ApplicationPlugin<WebSocketEventsConfiguration> =
 
 public class WebSocketEventsConfiguration {
 
-    public var channel: WebSocketEventChannel = defaultWebSocketEventChannel()
+    public var channel: WebSocketEventChannel? = null
 
     public var eventReceivingScope: CoroutineScope = defaultEventReceivingScope()
-}
 
-private fun defaultWebSocketEventChannel(): WebSocketEventChannel = Channel()
+    internal val requiredChannel = requireNotNull(channel) {
+        "channel is not configured."
+    }
+}
 
 private fun defaultEventReceivingScope() = CoroutineScope(Dispatchers.IO)

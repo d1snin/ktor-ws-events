@@ -23,3 +23,5 @@ import kotlinx.coroutines.channels.Channel
  * @see WebSocketEventSender
  */
 public typealias WebSocketEventChannel = Channel<WebSocketEvent<*>>
+
+public fun WebSocketEventChannel(): WebSocketEventChannel = Channel()

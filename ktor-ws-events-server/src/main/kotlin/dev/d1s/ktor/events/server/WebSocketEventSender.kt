@@ -16,14 +16,7 @@
 
 package dev.d1s.ktor.events.server
 
-import dev.d1s.ktor.events.commons.EventReference
 import dev.d1s.ktor.events.commons.WebSocketEvent
 import kotlinx.coroutines.channels.SendChannel
 
 public typealias WebSocketEventSender = SendChannel<WebSocketEvent<*>>
-
-public suspend fun WebSocketEventSender.pushWebSocketEvent(data: Any?, reference: EventReference) {
-    val event = WebSocketEvent(reference, data)
-
-    send(event)
-}
