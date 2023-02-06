@@ -14,10 +14,10 @@ dependencies {
     val ktorWsEventsVersion: String by project
 
     // server side
-    implementation("dev.d1s:ktor-ws-events:ktor-ws-events-server:$ktorWsEventsVersion")
+    implementation("dev.d1s.ktor-ws-events:ktor-ws-events-server:$ktorWsEventsVersion")
 
     // client side
-    implementation("dev.d1s:ktor-ws-events:ktor-ws-events-client:$ktorWsEventsVersion")
+    implementation("dev.d1s.ktor-ws-events:ktor-ws-events-client:$ktorWsEventsVersion")
 }
 ```
 
