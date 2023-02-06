@@ -66,7 +66,15 @@ fun HttpClient.listenToServerFailures() {
 }
 ```
 
-#### License
+### How to contribute
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+### Code of Conduct
+
+See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
+
+### License
 
 ```
    Copyright 2022-2023 Mikhail Titov
