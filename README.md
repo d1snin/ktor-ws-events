@@ -1,4 +1,4 @@
-[![](https://maven.d1s.dev/api/badge/latest/releases/dev/d1s/ktor-ws-events?color=40c14a&name=maven.d1s.dev&prefix=v)](https://maven.d1s.dev/#/releases/dev/d1s/ktor-ws-events)
+[![](https://maven.d1s.dev/api/badge/latest/releases/dev/d1s/ktor-ws-events/ktor-ws-events-commons?color=40c14a&name=maven.d1s.dev&prefix=v)](https://maven.d1s.dev/#/releases/dev/d1s/ktor-ws-events)
 
 Event streaming extensions for Ktor over WebSocket protocol.
 Support is provided for both client and server.
