@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package dev.d1s.ktor.events.commons
+package dev.d1s.ktor.events.server
 
-import io.ktor.websocket.*
+import dev.d1s.ktor.events.commons.WebSocketEvent
+import kotlinx.coroutines.channels.Channel
 
-public data class WsEventSendingConnection(
-    val eventSource: EventSource,
-    val session: DefaultWebSocketSession
-)
+public typealias WebSocketEventChannel = Channel<WebSocketEvent<*>>

@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 
-package dev.d1s.ktor.events.server
+package dev.d1s.ktor.events.client
 
-import dev.d1s.ktor.events.commons.WsEvent
-import kotlinx.coroutines.channels.SendChannel
+import io.ktor.util.*
 
-public typealias WsEventPublisher = SendChannel<WsEvent<*>>
+internal object Key {
+
+    internal val WebSocketEventsConfiguration =
+        AttributeKey<WebSocketEventsConfiguration>("websocket-events_websocket-events-configuration")
+}
+
+internal var Attributes.webSocketEventsConfiguration: WebSocketEventsConfiguration
+    get() = this[Key.WebSocketEventsConfiguration]
+    set(value) = this.put(Key.WebSocketEventsConfiguration, value)

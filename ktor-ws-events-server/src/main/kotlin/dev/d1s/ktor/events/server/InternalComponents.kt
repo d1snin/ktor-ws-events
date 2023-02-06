@@ -16,13 +16,17 @@
 
 package dev.d1s.ktor.events.server
 
-import dev.d1s.ktor.events.commons.EventSource
-import dev.d1s.ktor.events.commons.WsEvent
+import io.ktor.util.*
 
-public suspend fun WsEventPublisher.sendWsEvent(group: String, data: Any?, principal: String? = null) {
-    val source = EventSource(group, principal)
+internal object Key {
 
-    val event = WsEvent(source, data)
-
-    send(event)
+    internal val WebSocketEventConsumer =
+        AttributeKey<WebSocketEventConsumer>("${WEBSOCKET_EVENTS_PLUGIN_NAME}_websocket-event-consumer")
 }
+
+internal fun webSocketEventConsumer() =
+    DefaultWebSocketEventConsumer()
+
+internal var Attributes.webSocketEventConsumer: WebSocketEventConsumer
+    get() = this[Key.WebSocketEventConsumer]
+    set(value) = this.put(Key.WebSocketEventConsumer, value)

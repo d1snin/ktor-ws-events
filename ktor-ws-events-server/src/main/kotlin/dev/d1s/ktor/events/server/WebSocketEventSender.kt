@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package dev.d1s.ktor.events.client
+package dev.d1s.ktor.events.server
 
-import dev.d1s.ktor.events.commons.WsEvent
-import io.ktor.client.plugins.websocket.*
+import dev.d1s.ktor.events.commons.EventReference
+import dev.d1s.ktor.events.commons.WebSocketEvent
+import kotlinx.coroutines.channels.SendChannel
 
-public suspend fun <T> DefaultClientWebSocketSession.receiveWsEvent(): WsEvent<T> =
-    receiveDeserialized()
+public typealias WebSocketEventSender = SendChannel<WebSocketEvent<*>>
+
+public suspend fun WebSocketEventSender.sendWebSocketEvent(data: Any?, reference: EventReference) {
+    val event = WebSocketEvent(reference, data)
+
+    send(event)
+}

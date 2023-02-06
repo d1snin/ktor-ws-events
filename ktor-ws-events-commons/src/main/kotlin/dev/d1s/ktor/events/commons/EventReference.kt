@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package dev.d1s.ktor.events.commons.constant
+package dev.d1s.ktor.events.commons
 
-public const val GROUP_PATH_PARAMETER: String = "group"
-public const val GROUP_SEGMENT_PLACEHOLDER: String = "{$GROUP_PATH_PARAMETER}"
+public typealias EventGroup = String
 
-public const val DEFAULT_EVENTS_ROUTE: String = "/events/$GROUP_SEGMENT_PLACEHOLDER"
+public typealias EventPrincipal = String?
 
-public const val PRINCIPAL_QUERY_PARAMETER: String = "principal"
+public data class EventReference(
+    val group: EventGroup,
+    val principal: EventPrincipal = null
+)
+
+public fun ref(group: EventGroup, principal: EventPrincipal = null): EventReference = EventReference(group, principal)

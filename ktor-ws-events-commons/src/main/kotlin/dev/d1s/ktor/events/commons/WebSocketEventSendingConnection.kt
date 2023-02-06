@@ -16,7 +16,9 @@
 
 package dev.d1s.ktor.events.commons
 
-public data class EventSource(
-    val group: String,
-    val principal: String? = null
+import io.ktor.websocket.*
+
+public data class WebSocketEventSendingConnection(
+    val reference: EventReference,
+    val session: DefaultWebSocketSession
 )

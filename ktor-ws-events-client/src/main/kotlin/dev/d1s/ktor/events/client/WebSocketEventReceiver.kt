@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package dev.d1s.ktor.events.commons
+package dev.d1s.ktor.events.client
 
-public data class WsEvent<T>(
-    val source: EventSource,
-    val data: T
-)
+import dev.d1s.ktor.events.commons.WebSocketEvent
+import io.ktor.client.plugins.websocket.*
+
+public suspend fun <T> DefaultClientWebSocketSession.receiveWsEvent(): WebSocketEvent<T> =
+    receiveDeserialized()
