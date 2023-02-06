@@ -56,7 +56,34 @@ public typealias EventPrincipal = String?
 public data class EventReference(
     val group: EventGroup,
     val principal: EventPrincipal = null
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as EventReference
+
+        if (group != other.group) return false
+
+        val otherPrincipal = other.principal
+
+        if (principal != null) {
+            return if (otherPrincipal != null) {
+                principal == otherPrincipal
+            } else {
+                false
+            }
+        }
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = group.hashCode()
+        result = 31 * result + (principal?.hashCode() ?: 0)
+        return result
+    }
+}
 
 /**
  * A shortcut. Returns `EventReference(group, principal)`

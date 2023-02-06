@@ -53,7 +53,7 @@ internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
 
     private fun findConnection(reference: EventReference) =
         connections.find {
-            it.reference == reference
+            reference == it.reference
         }
 
     private suspend fun WebSocketEventSendingConnection?.sendEvent(event: WebSocketEvent<*>) {
