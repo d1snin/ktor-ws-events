@@ -18,7 +18,6 @@ package dev.d1s.ktor.events.server
 
 import dev.d1s.ktor.events.commons.EventReference
 import dev.d1s.ktor.events.commons.WebSocketEvent
-import dev.d1s.ktor.events.commons.WebSocketEventSendingConnection
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel

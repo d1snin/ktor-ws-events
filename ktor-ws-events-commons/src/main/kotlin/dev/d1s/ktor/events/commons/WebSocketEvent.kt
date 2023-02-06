@@ -16,7 +16,27 @@
 
 package dev.d1s.ktor.events.commons
 
+/**
+ * Example usage:
+ * ```kotlin
+ * val reference = ref("book_created")
+ * val createdBook: Book = createBook()
+ *
+ * val event = event(reference, createdBook)
+ * ```
+ *
+ * @param data Any data associated with this [WebSocketEvent].
+ * @see event
+ * @see ref
+ */
 public data class WebSocketEvent<T>(
     val reference: EventReference,
     val data: T
 )
+
+/**
+ * A shortcut. Returns `WebSocketEvent(reference, data)`
+ *
+ * @see WebSocketEvent
+ */
+public fun <T> event(reference: EventReference, data: T): WebSocketEvent<T> = WebSocketEvent(reference, data)

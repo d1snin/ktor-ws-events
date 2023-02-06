@@ -16,13 +16,51 @@
 
 package dev.d1s.ktor.events.commons
 
+/**
+ * Event group is used to combine events of the same type.
+ * For example: "book_updated" or "book_created".
+ *
+ * @see EventPrincipal
+ * @see EventReference
+ */
 public typealias EventGroup = String
 
+/**
+ * Event principal is used to combine events related to the same object.
+ * It could be any identifier of the object.
+ *
+ * For example:
+ * ```kotlin
+ * val reference = ref(group = "book_updated", principal = "528975892357")
+ * ```
+ * Where `principal` is a book ID.
+ *
+ * @see EventGroup
+ * @see EventReference
+ * @see ref
+ */
 public typealias EventPrincipal = String?
 
+/**
+ * Event reference acts as an identifier for a [WebSocketEvent].
+ *
+ * Example usage:
+ * ```kotlin
+ * val reference = ref(group = "book_updated", principal = "528975892357")
+ * ```
+ *
+ * @see EventGroup
+ * @see EventPrincipal
+ * @see ref
+ */
 public data class EventReference(
     val group: EventGroup,
     val principal: EventPrincipal = null
 )
 
+/**
+ * A shortcut. Returns `EventReference(group, principal)`
+ *
+ * @see EventReference
+ */
 public fun ref(group: EventGroup, principal: EventPrincipal = null): EventReference = EventReference(group, principal)

@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package dev.d1s.ktor.events.commons
+package dev.d1s.ktor.events.server
 
+import dev.d1s.ktor.events.commons.EventReference
 import io.ktor.websocket.*
 
-public data class WebSocketEventSendingConnection(
+internal data class WebSocketEventSendingConnection(
     val reference: EventReference,
     val session: DefaultWebSocketSession
 )

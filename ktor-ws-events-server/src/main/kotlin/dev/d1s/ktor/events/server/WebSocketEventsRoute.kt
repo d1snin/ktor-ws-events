@@ -17,12 +17,20 @@
 package dev.d1s.ktor.events.server
 
 import dev.d1s.ktor.events.commons.EventReference
-import dev.d1s.ktor.events.commons.WebSocketEventSendingConnection
 import dev.d1s.ktor.events.commons.util.Routes
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 
+/**
+ * Installs a WebSocket route to your application which is
+ * supposed to propagate [WebSocketEvents][dev.d1s.ktor.events.commons.WebSocketEvent] to clients.
+ * **This function is supposed to be called once.**
+ *
+ * @throws IllegalArgumentException if the provided route does not container group segment placeholder.
+ * @throws IllegalStateException if the application does not have [WebSocketEvents] plugin installed.
+ * @see WebSocketEvents
+ */
 public fun Route.webSocketEvents(route: String = Routes.DEFAULT_EVENTS_ROUTE) {
     require(route.contains(Routes.GROUP_SEGMENT_PLACEHOLDER)) {
         "Group segment placeholder ${Routes.GROUP_SEGMENT_PLACEHOLDER} must be present."

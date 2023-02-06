@@ -25,6 +25,22 @@ import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.websocket.*
 
+/**
+ * Opens a [block] with [DefaultClientWebSocketSession] associated with the given [event reference][reference] and optional [path].
+ *
+ * Example usage:
+ * ```kotlin
+ * client.webSocketEvents(ref("book_updated", "<book_id>")) {
+ *     val event: WebSocketEvent<Book> = receiveWebSocketEvent()
+ *
+ *     println(event.data.author)
+ * }
+ * ```
+ * @throws IllegalStateException if [WebSocketEvents] plugin is not installed.
+ * @see receiveWebSocketEvent
+ * @see dev.d1s.ktor.events.commons.ref
+ * @see WebSocketEvents
+ */
 public suspend fun HttpClient.webSocketEvents(
     reference: EventReference,
     path: String = makeDefaultEventsRoute(reference.group),

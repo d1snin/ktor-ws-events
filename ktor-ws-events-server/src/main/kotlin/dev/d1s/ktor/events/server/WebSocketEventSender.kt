@@ -22,7 +22,7 @@ import kotlinx.coroutines.channels.SendChannel
 
 public typealias WebSocketEventSender = SendChannel<WebSocketEvent<*>>
 
-public suspend fun WebSocketEventSender.sendWebSocketEvent(data: Any?, reference: EventReference) {
+public suspend fun WebSocketEventSender.pushWebSocketEvent(data: Any?, reference: EventReference) {
     val event = WebSocketEvent(reference, data)
 
     send(event)
