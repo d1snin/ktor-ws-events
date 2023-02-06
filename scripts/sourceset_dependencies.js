@@ -1,0 +1,1 @@
+sourceset_dependencies = '{":ktor-ws-events-server:dokkaHtmlPartial/main":[],":ktor-ws-events-commons:dokkaHtmlPartial/main":[],":ktor-ws-events-client:dokkaHtmlPartial/main":[]}'

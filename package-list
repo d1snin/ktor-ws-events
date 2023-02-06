@@ -1,0 +1,10 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+
+module:ktor-ws-events-client
+dev.d1s.ktor.events.client
+module:ktor-ws-events-commons
+dev.d1s.ktor.events.commons
+dev.d1s.ktor.events.commons.util
+module:ktor-ws-events-server
+dev.d1s.ktor.events.server
