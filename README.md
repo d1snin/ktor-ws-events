@@ -1,6 +1,70 @@
-[![](https://jitpack.io/v/dev.d1s/ktor-ws-events.svg)](https://jitpack.io/#dev.d1s/ktor-ws-events)
+[![](https://maven.d1s.dev/api/badge/latest/releases/dev/d1s/ktor-ws-events?color=40c14a&name=maven.d1s.dev&prefix=v)](https://maven.d1s.dev/#/releases/dev/d1s/ktor-ws-events)
 
-Event management over WS for Ktor.
+Event streaming extensions for Ktor over WebSocket protocol.
+Support is provided for both client and server.
+
+### Installation
+
+```kotlin
+repositories {
+    maven(url = "https://maven.d1s.dev/releases")
+}
+
+dependencies {
+    val ktorWsEventsVersion: String by project
+
+    // server side
+    implementation("dev.d1s:ktor-ws-events:ktor-ws-events-server:$ktorWsEventsVersion")
+
+    // client side
+    implementation("dev.d1s:ktor-ws-events:ktor-ws-events-client:$ktorWsEventsVersion")
+}
+```
+
+### Example usage on the server side
+
+```kotlin
+val eventChannel = WebSocketEventChannel()
+
+fun Application.configureWebSocketEvents() {
+    install(WebSocketEvents) {
+        channel = eventChannel
+    }
+
+    routing {
+        webSocketEvents()
+    }
+}
+
+fun handleServerFailure(failure: ServerFailure) {
+    val reference = ref("server_failure")
+    val event = event(reference, failure)
+
+    eventChannel.send(event)
+}
+```
+
+### Example usage on the client side
+
+```kotlin
+fun HttClient.configureWebSocketEvents() {
+    install(WebSocketEvents) {
+        host = "example.com"
+        port = 9090
+    }
+}
+
+fun HttpClient.listenToServerFailures() {
+    val reference = ref("server_failure")
+
+    webSocketEvents(reference) {
+        val event = receiveWebSocketEvent<ServerFailure>()
+        val failure = event.data
+
+        notifyTeam(failure)
+    }
+}
+```
 
 #### License
 
