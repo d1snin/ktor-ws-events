@@ -17,6 +17,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
+import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
@@ -38,9 +39,10 @@ buildscript {
 
 allprojects {
     apply {
+        plugin("org.jetbrains.kotlin.jvm")
         plugin("java-library")
         plugin("maven-publish")
-        plugin("org.jetbrains.kotlin.jvm")
+        plugin("org.jetbrains.dokka")
     }
 
     val projectGroup: String by project
@@ -116,6 +118,13 @@ allprojects {
             footerMessage = "Copyright (c) 2022-2023 Mikhail Titov"
         }
     }
+
+    tasks.withType<DokkaMultiModuleTask> {
+        val outputDir = buildDir.resolve("dokkaMultiModule")
+
+        outputDirectory.set(outputDir)
+    }
+
 
     kotlin {
         explicitApi()
