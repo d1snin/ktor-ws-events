@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+apply {
+    val publishingScript: String by project
+
+    from(publishingScript)
+}
+
 dependencies {
     val ktorVersion: String by project
 

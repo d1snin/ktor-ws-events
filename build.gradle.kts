@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
@@ -38,10 +37,13 @@ buildscript {
 }
 
 allprojects {
+    ext {
+        set("publishingScript", "${rootProject.projectDir.absolutePath}/publishing.gradle.kts")
+    }
+
     apply {
         plugin("org.jetbrains.kotlin.jvm")
         plugin("java-library")
-        plugin("maven-publish")
         plugin("org.jetbrains.dokka")
     }
 
@@ -62,41 +64,6 @@ allprojects {
 
     dependencies {
         implementation(kotlin("stdlib"))
-    }
-
-    publishing {
-        repositories {
-            maven {
-                name = "mavenD1sDevRepository"
-
-                val channel = if (isDevVersion) {
-                    "snapshots"
-                } else {
-                    "releases"
-                }
-
-                url = uri("https://maven.d1s.dev/${channel.toLowerCaseAsciiOnly()}")
-
-                credentials {
-                    username = System.getenv("MAVEN_D1S_DEV_USERNAME")
-                    password = System.getenv("MAVEN_D1S_DEV_PASSWORD")
-                }
-            }
-        }
-
-        publications {
-            create<MavenPublication>("maven") {
-                from(components["java"])
-
-                if (isDevVersion) {
-                    val commitShortSha = System.getenv("GIT_SHORT_COMMIT_SHA")
-
-                    commitShortSha?.let {
-                        version = "$version-$it"
-                    }
-                }
-            }
-        }
     }
 
     tasks.withType<KotlinCompile> {
@@ -130,5 +97,3 @@ allprojects {
         explicitApi()
     }
 }
-
-val Project.isDevVersion get() = this.version.toString().endsWith("-dev")
