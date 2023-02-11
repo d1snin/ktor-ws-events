@@ -17,8 +17,10 @@
 package dev.d1s.ktor.events.server
 
 import io.ktor.server.application.*
+import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import java.time.Duration
 
 internal const val WEBSOCKET_EVENTS_PLUGIN_NAME = "websocket-events"
 
@@ -52,6 +54,10 @@ internal const val WEBSOCKET_EVENTS_PLUGIN_NAME = "websocket-events"
  */
 public val WebSocketEvents: ApplicationPlugin<WebSocketEventsConfiguration> =
     createApplicationPlugin(WEBSOCKET_EVENTS_PLUGIN_NAME, ::WebSocketEventsConfiguration) {
+        if (!application.hasWebSocketsPlugin()) {
+            application.installWebSockets()
+        }
+
         val eventReceivingScope = pluginConfig.eventReceivingScope
         val channel = pluginConfig.requiredChannel
 
@@ -74,3 +80,14 @@ public class WebSocketEventsConfiguration {
 }
 
 private fun defaultEventReceivingScope() = CoroutineScope(Dispatchers.IO)
+
+private fun Application.hasWebSocketsPlugin() = pluginOrNull(WebSockets) != null
+
+private fun Application.installWebSockets() {
+    install(WebSockets) {
+        pingPeriod = Duration.ofSeconds(15)
+        timeout = Duration.ofSeconds(15)
+        maxFrameSize = Long.MAX_VALUE
+        masking = false
+    }
+}
