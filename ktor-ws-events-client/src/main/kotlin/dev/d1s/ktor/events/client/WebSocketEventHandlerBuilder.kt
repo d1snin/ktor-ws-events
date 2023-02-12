@@ -44,7 +44,7 @@ import io.ktor.websocket.*
 public suspend fun HttpClient.webSocketEvents(
     reference: EventReference,
     path: String = makeDefaultEventsRoute(reference.group),
-    block: suspend DefaultWebSocketSession.() -> Unit
+    block: suspend DefaultClientWebSocketSession.() -> Unit
 ) {
     checkPluginInstalled()
 
