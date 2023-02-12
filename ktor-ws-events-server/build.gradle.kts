@@ -26,5 +26,6 @@ dependencies {
     api(project(":ktor-ws-events-commons"))
 
     implementation("io.ktor:ktor-server-core:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
     api("io.ktor:ktor-server-websockets:$ktorVersion")
 }
