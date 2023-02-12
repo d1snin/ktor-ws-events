@@ -49,6 +49,10 @@ public fun Route.webSocketEvents(route: String = Routes.DEFAULT_EVENTS_ROUTE) {
         val connection = WebSocketEventSendingConnection(eventReference, this)
 
         consumer.addConnection(connection)
+
+        while (true) {
+            incoming.receive()
+        }
     }
 }
 
