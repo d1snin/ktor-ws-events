@@ -48,6 +48,8 @@ fun handleServerFailure(failure: ServerFailure) {
 
 ```kotlin
 fun HttClient.configureWebSocketEvents() {
+    install(WebSockets)
+    
     install(WebSocketEvents) {
         host = "example.com"
         port = 9090
