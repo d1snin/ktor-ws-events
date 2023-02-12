@@ -62,13 +62,17 @@ internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
         connections += connection
 
         log.d {
-            "Added connection with reference: ${connection.reference}"
+            "Added connection with reference: ${connection.reference}. Connections: $connections"
         }
     }
 
     private fun findConnection(reference: EventReference): WebSocketEventSendingConnection? {
+        log.v {
+            "Finding connection in $connections"
+        }
+
         val connection = connections.find {
-            reference == it.reference
+            it.reference == reference
         }
 
         log.d {
