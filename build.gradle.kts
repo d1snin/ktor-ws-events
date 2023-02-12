@@ -43,7 +43,6 @@ allprojects {
 
     apply {
         plugin("org.jetbrains.kotlin.jvm")
-        plugin("java-library")
         plugin("org.jetbrains.dokka")
     }
 
@@ -63,7 +62,12 @@ allprojects {
     }
 
     dependencies {
+        val kmLogVersion: String by project
+        val logbackVersion: String by project
+
         implementation(kotlin("stdlib"))
+        implementation("org.lighthousegames:logging:$kmLogVersion")
+        implementation("ch.qos.logback:logback-classic:$logbackVersion")
     }
 
     tasks.withType<KotlinCompile> {
