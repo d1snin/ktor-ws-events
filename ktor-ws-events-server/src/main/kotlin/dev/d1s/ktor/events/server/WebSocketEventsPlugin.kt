@@ -53,12 +53,12 @@ internal const val WEBSOCKET_EVENTS_PLUGIN_NAME = "websocket-events"
  */
 public val WebSocketEvents: ApplicationPlugin<WebSocketEventsConfiguration> =
     createApplicationPlugin(WEBSOCKET_EVENTS_PLUGIN_NAME, ::WebSocketEventsConfiguration) {
+        val eventReceivingScope = pluginConfig.eventReceivingScope
+        val channel = pluginConfig.requiredChannel
+
         if (!application.hasWebSocketsPlugin()) {
             application.installWebSockets()
         }
-
-        val eventReceivingScope = pluginConfig.eventReceivingScope
-        val channel = pluginConfig.requiredChannel
 
         val webSocketEventConsumer = webSocketEventConsumer()
 
@@ -73,7 +73,7 @@ public class WebSocketEventsConfiguration {
 
     public var eventReceivingScope: CoroutineScope = defaultEventReceivingScope()
 
-    internal val requiredChannel = requireNotNull(channel) {
+    internal val requiredChannel get() = requireNotNull(channel) {
         "channel is not configured."
     }
 }
