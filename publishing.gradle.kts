@@ -15,6 +15,7 @@
  */
 
 apply {
+    plugin("java-library")
     plugin("maven-publish")
 }
 
