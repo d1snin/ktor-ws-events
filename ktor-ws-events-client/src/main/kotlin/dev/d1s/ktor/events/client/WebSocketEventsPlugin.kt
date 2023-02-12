@@ -16,11 +16,16 @@
 
 package dev.d1s.ktor.events.client
 
+import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.api.*
+import io.ktor.client.plugins.websocket.*
 
 public val WebSocketEvents: ClientPlugin<WebSocketEventsConfiguration> =
     createClientPlugin("websocket-events", ::WebSocketEventsConfiguration) {
         pluginConfig.validate()
+
+        client.checkWebSocketsPluginInstalled()
 
         client.attributes.webSocketEventsConfiguration = pluginConfig
     }
@@ -45,4 +50,8 @@ public class WebSocketEventsConfiguration {
         requiredHost
         requiredPort
     }
+}
+
+private fun HttpClient.checkWebSocketsPluginInstalled() {
+    pluginOrNull(WebSockets) ?: error("WebSockets plugin is not installed.")
 }
