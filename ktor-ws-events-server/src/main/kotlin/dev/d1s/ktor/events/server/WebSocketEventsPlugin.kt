@@ -20,8 +20,11 @@ import io.ktor.server.application.*
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import org.lighthousegames.logging.logging
 
 internal const val WEBSOCKET_EVENTS_PLUGIN_NAME = "websocket-events"
+
+private val log = logging()
 
 /**
  * Enables support for event streaming over WebSockets.
@@ -53,6 +56,10 @@ internal const val WEBSOCKET_EVENTS_PLUGIN_NAME = "websocket-events"
  */
 public val WebSocketEvents: ApplicationPlugin<WebSocketEventsConfiguration> =
     createApplicationPlugin(WEBSOCKET_EVENTS_PLUGIN_NAME, ::WebSocketEventsConfiguration) {
+        log.v {
+            "Installing WebSocketEvents plugin"
+        }
+
         val eventReceivingScope = pluginConfig.eventReceivingScope
         val channel = pluginConfig.requiredChannel
 
@@ -73,9 +80,10 @@ public class WebSocketEventsConfiguration {
 
     public var eventReceivingScope: CoroutineScope = defaultEventReceivingScope()
 
-    internal val requiredChannel get() = requireNotNull(channel) {
-        "channel is not configured."
-    }
+    internal val requiredChannel
+        get() = requireNotNull(channel) {
+            "channel is not configured."
+        }
 }
 
 private fun defaultEventReceivingScope() = CoroutineScope(Dispatchers.IO)

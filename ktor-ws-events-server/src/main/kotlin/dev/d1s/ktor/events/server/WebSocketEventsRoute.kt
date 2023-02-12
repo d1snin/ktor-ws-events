@@ -21,6 +21,9 @@ import dev.d1s.ktor.events.commons.util.Routes
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
+import org.lighthousegames.logging.logging
+
+private val log = logging()
 
 /**
  * Installs a WebSocket route to your application which is
@@ -32,6 +35,10 @@ import io.ktor.server.websocket.*
  * @see WebSocketEvents
  */
 public fun Route.webSocketEvents(route: String = Routes.DEFAULT_EVENTS_ROUTE) {
+    log.v {
+        "Exposing route $route"
+    }
+
     require(route.contains(Routes.GROUP_SEGMENT_PLACEHOLDER)) {
         "Group segment placeholder ${Routes.GROUP_SEGMENT_PLACEHOLDER} must be present."
     }
@@ -41,10 +48,18 @@ public fun Route.webSocketEvents(route: String = Routes.DEFAULT_EVENTS_ROUTE) {
     val consumer = application.attributes.webSocketEventConsumer
 
     webSocket(route) {
+        log.d {
+            "Handled WS session"
+        }
+
         val eventReference = EventReference(
             call.parameters[Routes.GROUP_PATH_PARAMETER] ?: error("Group parameter is not present."),
             call.request.queryParameters[Routes.PRINCIPAL_QUERY_PARAMETER]
         )
+
+        log.d {
+            "Extracted event reference: $eventReference"
+        }
 
         val connection = WebSocketEventSendingConnection(eventReference, this)
 

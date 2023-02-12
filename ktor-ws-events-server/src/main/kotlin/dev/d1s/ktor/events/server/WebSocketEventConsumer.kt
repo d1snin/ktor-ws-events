@@ -22,6 +22,7 @@ import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
+import org.lighthousegames.logging.logging
 import java.util.concurrent.CopyOnWriteArrayList
 
 internal typealias WebSocketEventReceiver = ReceiveChannel<WebSocketEvent<*>>
@@ -37,9 +38,19 @@ internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
 
     private val connections = CopyOnWriteArrayList<WebSocketEventSendingConnection>()
 
+    private val log = logging()
+
     override fun launch(eventReceivingScope: CoroutineScope, channel: WebSocketEventReceiver) {
+        log.d {
+            "Launching WebSocket event consumer..."
+        }
+
         eventReceivingScope.launch {
             for (event in channel) {
+                log.d {
+                    "Consumed event $event"
+                }
+
                 val connection = findConnection(event.reference)
 
                 connection.sendEvent(event)
@@ -49,14 +60,29 @@ internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
 
     override fun addConnection(connection: WebSocketEventSendingConnection) {
         connections += connection
+
+        log.d {
+            "Added connection with reference: ${connection.reference}"
+        }
     }
 
-    private fun findConnection(reference: EventReference) =
-        connections.find {
+    private fun findConnection(reference: EventReference): WebSocketEventSendingConnection? {
+        val connection = connections.find {
             reference == it.reference
         }
 
+        log.d {
+            "Found connection $connection. Wanted a connection with reference $reference"
+        }
+
+        return connection
+    }
+
     private suspend fun WebSocketEventSendingConnection?.sendEvent(event: WebSocketEvent<*>) {
+        log.d {
+            "Sending event..."
+        }
+
         val session = this?.session as? WebSocketServerSession
 
         session?.sendSerialized(event)
