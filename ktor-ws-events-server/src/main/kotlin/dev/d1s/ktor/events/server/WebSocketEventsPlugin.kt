@@ -16,6 +16,7 @@
 
 package dev.d1s.ktor.events.server
 
+import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
@@ -91,5 +92,7 @@ private fun defaultEventReceivingScope() = CoroutineScope(Dispatchers.IO)
 private fun Application.hasWebSocketsPlugin() = pluginOrNull(WebSockets) != null
 
 private fun Application.installWebSockets() {
-    install(WebSockets)
+    install(WebSockets) {
+        contentConverter = JacksonWebsocketContentConverter()
+    }
 }
