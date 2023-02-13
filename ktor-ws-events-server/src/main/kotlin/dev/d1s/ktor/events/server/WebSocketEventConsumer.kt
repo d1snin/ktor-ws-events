@@ -16,14 +16,14 @@
 
 package dev.d1s.ktor.events.server
 
-import dev.d1s.ktor.events.commons.EventReference
 import dev.d1s.ktor.events.commons.WebSocketEvent
+import io.ktor.server.application.*
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import org.lighthousegames.logging.logging
-import java.util.concurrent.CopyOnWriteArrayList
 
 internal typealias WebSocketEventReceiver = ReceiveChannel<WebSocketEvent<*>>
 
@@ -34,9 +34,11 @@ internal interface WebSocketEventConsumer {
     fun addConnection(connection: WebSocketEventSendingConnection)
 }
 
-internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
+internal class DefaultWebSocketEventConsumer(application: Application) : WebSocketEventConsumer {
 
-    private val connections = CopyOnWriteArrayList<WebSocketEventSendingConnection>()
+    private val connectionPool by lazy {
+        application.attributes.webSocketEventSendingConnectionPool
+    }
 
     private val log = logging()
 
@@ -51,7 +53,7 @@ internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
                     "Consumed event $event"
                 }
 
-                val connection = findConnection(event.reference)
+                val connection = connectionPool[event.reference]
 
                 connection.sendEvent(event)
             }
@@ -59,36 +61,21 @@ internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
     }
 
     override fun addConnection(connection: WebSocketEventSendingConnection) {
-        connections += connection
-
-        log.d {
-            "Added connection with reference: ${connection.reference}. Connections: $connections"
-        }
+        connectionPool += connection
     }
 
-    private fun findConnection(reference: EventReference): WebSocketEventSendingConnection? {
-        log.v {
-            "Finding connection in $connections"
-        }
-
-        val connection = connections.find {
-            it.reference == reference
-        }
-
-        log.d {
-            "Found connection $connection. Wanted a connection with reference $reference"
-        }
-
-        return connection
-    }
-
+    @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun WebSocketEventSendingConnection?.sendEvent(event: WebSocketEvent<*>) {
         log.d {
-            "Sending event..."
+            "Sending event... Connection: $this"
         }
 
-        val session = this?.session as? WebSocketServerSession
-
-        session?.sendSerialized(event)
+        (this?.session as? WebSocketServerSession)?.let { session ->
+            if (!session.incoming.isClosedForReceive) {
+                session.sendSerialized(event)
+            } else {
+                connectionPool -= event.reference
+            }
+        }
     }
 }

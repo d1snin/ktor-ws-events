@@ -21,6 +21,7 @@ import dev.d1s.ktor.events.commons.util.Routes
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.lighthousegames.logging.logging
 
 private val log = logging()
@@ -34,6 +35,7 @@ private val log = logging()
  * @throws IllegalStateException if the application does not have [WebSocketEvents] plugin installed.
  * @see WebSocketEvents
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 public fun Route.webSocketEvents(route: String = Routes.DEFAULT_EVENTS_ROUTE) {
     log.v {
         "Exposing route $route"
@@ -66,7 +68,9 @@ public fun Route.webSocketEvents(route: String = Routes.DEFAULT_EVENTS_ROUTE) {
         consumer.addConnection(connection)
 
         while (true) {
-            incoming.receive()
+            if (!incoming.isClosedForReceive) {
+                incoming.receive()
+            }
         }
     }
 }
