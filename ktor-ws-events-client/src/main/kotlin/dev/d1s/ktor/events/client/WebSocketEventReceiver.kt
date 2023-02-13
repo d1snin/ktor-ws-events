@@ -24,5 +24,5 @@ import io.ktor.client.plugins.websocket.*
  *
  * @see webSocketEvents
  */
-public suspend fun <T> DefaultClientWebSocketSession.receiveWebSocketEvent(): WebSocketEvent<T> =
+public suspend inline fun <reified T> DefaultClientWebSocketSession.receiveWebSocketEvent(): WebSocketEvent<T> =
     receiveDeserialized()
