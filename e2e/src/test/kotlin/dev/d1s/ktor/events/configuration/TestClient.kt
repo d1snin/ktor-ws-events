@@ -14,27 +14,21 @@
  * limitations under the License.
  */
 
-rootProject.name = "ktor-ws-events"
+package dev.d1s.ktor.events.configuration
 
-pluginManagement {
-    plugins {
-        val kotlinVersion: String by settings
+import dev.d1s.ktor.events.client.WebSocketEvents
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.websocket.*
+import io.ktor.serialization.jackson.*
 
-        val dokkaVersion: String by settings
+val webSocketClient = HttpClient(CIO) {
+    install(WebSockets) {
+        contentConverter = JacksonWebsocketContentConverter()
+    }
 
-        val versionsPluginVersion: String by settings
-
-        kotlin("jvm") version kotlinVersion
-
-        id("org.jetbrains.dokka") version dokkaVersion
-
-        id("com.github.ben-manes.versions") version versionsPluginVersion
+    install(WebSocketEvents) {
+        host = "localhost"
+        port = TEST_SERVER_PORT
     }
 }
-
-include(
-    "e2e",
-    "ktor-ws-events-client",
-    "ktor-ws-events-commons",
-    "ktor-ws-events-server"
-)

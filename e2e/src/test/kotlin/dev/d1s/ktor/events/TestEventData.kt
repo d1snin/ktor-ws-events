@@ -14,27 +14,17 @@
  * limitations under the License.
  */
 
-rootProject.name = "ktor-ws-events"
+package dev.d1s.ktor.events
 
-pluginManagement {
-    plugins {
-        val kotlinVersion: String by settings
+import dev.d1s.ktor.events.commons.ref
 
-        val dokkaVersion: String by settings
+const val TEST_MESSAGE = "Hello, World!"
 
-        val versionsPluginVersion: String by settings
-
-        kotlin("jvm") version kotlinVersion
-
-        id("org.jetbrains.dokka") version dokkaVersion
-
-        id("com.github.ben-manes.versions") version versionsPluginVersion
-    }
-}
-
-include(
-    "e2e",
-    "ktor-ws-events-client",
-    "ktor-ws-events-commons",
-    "ktor-ws-events-server"
+data class TestEventData(
+    val message: String
 )
+
+val testEventData = TestEventData(TEST_MESSAGE)
+
+val testServerEventReference = ref("test_group", "test_principal")
+val testClientEventReference = ref("test_group", null)

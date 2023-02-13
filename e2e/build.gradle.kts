@@ -14,27 +14,16 @@
  * limitations under the License.
  */
 
-rootProject.name = "ktor-ws-events"
+dependencies {
+    val ktorVersion: String by project
 
-pluginManagement {
-    plugins {
-        val kotlinVersion: String by settings
+    testImplementation(project(":ktor-ws-events-server"))
+    testImplementation(project(":ktor-ws-events-client"))
 
-        val dokkaVersion: String by settings
-
-        val versionsPluginVersion: String by settings
-
-        kotlin("jvm") version kotlinVersion
-
-        id("org.jetbrains.dokka") version dokkaVersion
-
-        id("com.github.ben-manes.versions") version versionsPluginVersion
-    }
+    testImplementation(kotlin("test-junit"))
+    
+    testImplementation("io.ktor:ktor-server-netty:$ktorVersion")
+    testImplementation("io.ktor:ktor-client-cio:$ktorVersion")
+    testImplementation("io.ktor:ktor-client-websockets:$ktorVersion")
+    testImplementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
 }
-
-include(
-    "e2e",
-    "ktor-ws-events-client",
-    "ktor-ws-events-commons",
-    "ktor-ws-events-server"
-)
