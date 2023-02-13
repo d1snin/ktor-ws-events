@@ -16,22 +16,16 @@
 
 package dev.d1s.ktor.events.server
 
-import io.ktor.server.application.*
 import io.ktor.util.*
 
 internal object Key {
 
     internal val WebSocketEventConsumer =
-        AttributeKey<WebSocketEventConsumer>(name("websocket-event-consumer"))
-
-    internal val WebSocketEventSendingConnectionPool =
-        AttributeKey<WebSocketEventSendingConnectionPool>(name("websocket-event-sending-connection-pool"))
-
-    private fun name(component: String) = "${WEBSOCKET_EVENTS_PLUGIN_NAME}_$component"
+        AttributeKey<WebSocketEventConsumer>("${WEBSOCKET_EVENTS_PLUGIN_NAME}_websocket-event-consumer")
 }
 
-internal fun webSocketEventConsumer(application: Application) =
-    DefaultWebSocketEventConsumer(application)
+internal fun webSocketEventConsumer() =
+    DefaultWebSocketEventConsumer()
 
 internal fun webSocketEventSendingConnectionPool() =
     DefaultWebSocketEventSendingConnectionPool()
@@ -39,7 +33,3 @@ internal fun webSocketEventSendingConnectionPool() =
 internal var Attributes.webSocketEventConsumer: WebSocketEventConsumer
     get() = this[Key.WebSocketEventConsumer]
     set(value) = this.put(Key.WebSocketEventConsumer, value)
-
-internal var Attributes.webSocketEventSendingConnectionPool: WebSocketEventSendingConnectionPool
-    get() = this[Key.WebSocketEventSendingConnectionPool]
-    set(value) = this.put(Key.WebSocketEventSendingConnectionPool, value)

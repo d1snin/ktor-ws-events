@@ -34,11 +34,9 @@ internal interface WebSocketEventConsumer {
     fun addConnection(connection: WebSocketEventSendingConnection)
 }
 
-internal class DefaultWebSocketEventConsumer(application: Application) : WebSocketEventConsumer {
+internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
 
-    private val connectionPool by lazy {
-        application.attributes.webSocketEventSendingConnectionPool
-    }
+    private val connectionPool = webSocketEventSendingConnectionPool()
 
     private val log = logging()
 

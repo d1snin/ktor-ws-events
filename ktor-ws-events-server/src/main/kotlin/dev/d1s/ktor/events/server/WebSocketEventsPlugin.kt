@@ -65,11 +65,9 @@ public val WebSocketEvents: ApplicationPlugin<WebSocketEventsConfiguration> =
             application.installWebSockets()
         }
 
-        val webSocketEventSendingConnectionPool = webSocketEventSendingConnectionPool()
-        val webSocketEventConsumer = webSocketEventConsumer(application)
-
-        application.attributes.webSocketEventSendingConnectionPool = webSocketEventSendingConnectionPool
-        application.attributes.webSocketEventConsumer = webSocketEventConsumer
+        val webSocketEventConsumer = webSocketEventConsumer().apply {
+            application.attributes.webSocketEventConsumer = this
+        }
 
         val eventReceivingScope = pluginConfig.eventReceivingScope
         val channel = pluginConfig.requiredChannel
