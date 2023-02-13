@@ -1,0 +1,21 @@
+name: Run End-to-End tests
+
+on:
+  push
+
+jobs:
+  e2e_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'liberica'
+          cache: 'gradle'
+
+      - name: Run End-to-End tests
+        run: ./gradlew e2e:test
