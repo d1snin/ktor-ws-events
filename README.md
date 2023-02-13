@@ -1,3 +1,4 @@
+[![](https://github.com/d1snin/ktor-ws-events/actions/workflows/e2e-test.yml/badge.svg)](https://github.com/d1snin/ktor-ws-events/actions/workflows/e2e-test.yml)
 [![](https://maven.d1s.dev/api/badge/latest/releases/dev/d1s/ktor-ws-events/ktor-ws-events-commons?color=40c14a&name=maven.d1s.dev&prefix=v)](https://maven.d1s.dev/#/releases/dev/d1s/ktor-ws-events)
 
 Event streaming extensions for Ktor over WebSocket protocol.
