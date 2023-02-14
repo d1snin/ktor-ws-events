@@ -54,6 +54,38 @@
 <div class="main-content" id="content" pageIds="ktor-ws-events::.ext/allModules///PointingToDeclaration//0">
   <div class="breadcrumbs"></div>
   <div class="cover ">
+    <div class="cover ">
+      <p class="paragraph"><a href="https://github.com/d1snin/ktor-ws-events/actions/workflows/e2e-test.yml"><img alt="" src="https://github.com/d1snin/ktor-ws-events/actions/workflows/e2e-test.yml/badge.svg"></a> <a href="https://maven.d1s.dev/#/releases/dev/d1s/ktor-ws-events"></a></p>
+      <p class="paragraph">Event streaming extensions for Ktor over WebSocket protocol. Support is provided for both client and server.</p>
+      <h3 class=""> Installation</h3>
+      <div class="sample-container">
+        <pre><code class="block lang-kotlin" theme="idea">repositories {<br>    maven(url = &quot;https://maven.d1s.dev/releases&quot;)<br>}<br><br>dependencies {<br>    val ktorWsEventsVersion: String by project<br><br>    // server side<br>    implementation(&quot;dev.d1s.ktor-ws-events:ktor-ws-events-server:$ktorWsEventsVersion&quot;)<br><br>    // client side<br>    implementation(&quot;dev.d1s.ktor-ws-events:ktor-ws-events-client:$ktorWsEventsVersion&quot;)<br>}</code></pre>
+<span class="top-right-position"><span class="copy-icon"></span>
+          <div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div>
+        </span></div>
+      <h3 class=""> Example usage on the server side</h3>
+      <div class="sample-container">
+        <pre><code class="block lang-kotlin" theme="idea">val eventChannel = WebSocketEventChannel()<br><br>fun Application.configureWebSocketEvents() {<br>    install(WebSocketEvents) {<br>        channel = eventChannel<br>    }<br><br>    routing {<br>        webSocketEvents()<br>    }<br>}<br><br>fun handleServerFailure(failure: ServerFailure) {<br>    val reference = ref(&quot;server_failure&quot;)<br>    val event = event(reference, failure)<br><br>    eventChannel.send(event)<br>}</code></pre>
+<span class="top-right-position"><span class="copy-icon"></span>
+          <div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div>
+        </span></div>
+      <h3 class=""> Example usage on the client side</h3>
+      <div class="sample-container">
+        <pre><code class="block lang-kotlin" theme="idea">fun HttClient.configureWebSocketEvents() {<br>    install(WebSockets)<br>    <br>    install(WebSocketEvents) {<br>        host = &quot;example.com&quot;<br>        port = 9090<br>    }<br>}<br><br>fun HttpClient.listenToServerFailures() {<br>    val reference = ref(&quot;server_failure&quot;)<br><br>    webSocketEvents(reference) {<br>        val event = receiveWebSocketEvent&lt;ServerFailure&gt;()<br>        val failure = event.data<br><br>        notifyTeam(failure)<br>    }<br>}</code></pre>
+<span class="top-right-position"><span class="copy-icon"></span>
+          <div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div>
+        </span></div>
+      <h3 class=""> How to contribute</h3>
+      <p class="paragraph">See ./CONTRIBUTING.md</p>
+      <h3 class=""> Code of Conduct</h3>
+      <p class="paragraph">See ./CODE_OF_CONDUCT.md</p>
+      <h3 class=""> License</h3>
+      <div class="sample-container">
+        <pre><code class="block lang-kotlin" theme="idea">   Copyright 2022-2023 Mikhail Titov<br><br>   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);<br>   you may not use this file except in compliance with the License.<br>   You may obtain a copy of the License at<br><br>       https://www.apache.org/licenses/LICENSE-2.0<br><br>   Unless required by applicable law or agreed to in writing, software<br>   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,<br>   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<br>   See the License for the specific language governing permissions and<br>   limitations under the License.</code></pre>
+<span class="top-right-position"><span class="copy-icon"></span>
+          <div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div>
+        </span></div>
+    </div>
     <h2 class="">All modules:</h2>
     <div class="table"><a data-name="52620030%2FMain%2F0" anchor-label="ktor-ws-events-client" id="52620030%2FMain%2F0" data-filterable-set=""></a>
       <div class="table-row">
@@ -63,7 +95,9 @@
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="52620030%2FMain%2F0"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
-          <div><span class="brief-comment"></span></div>
+          <div><span class="brief-comment">
+              <p class="paragraph">Client module of Ktor WS Events project - Event delivery extensions for Ktor (Server/Client) over WebSocket protocol.</p>
+            </span></div>
         </div>
       </div>
 <a data-name="-2126807023%2FMain%2F0" anchor-label="ktor-ws-events-commons" id="-2126807023%2FMain%2F0" data-filterable-set=""></a>
@@ -74,7 +108,9 @@
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2126807023%2FMain%2F0"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
-          <div><span class="brief-comment"></span></div>
+          <div><span class="brief-comment">
+              <p class="paragraph">A module with common code of Ktor WS Events project - Event delivery extensions for Ktor (Server/Client) over WebSocket protocol.</p>
+            </span></div>
         </div>
       </div>
 <a data-name="-1222965626%2FMain%2F0" anchor-label="ktor-ws-events-server" id="-1222965626%2FMain%2F0" data-filterable-set=""></a>
@@ -85,14 +121,16 @@
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1222965626%2FMain%2F0"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
-          <div><span class="brief-comment"></span></div>
+          <div><span class="brief-comment">
+              <p class="paragraph">Server module of Ktor WS Events project - Event delivery extensions for Ktor (Server/Client) over WebSocket protocol.</p>
+            </span></div>
         </div>
       </div>
     </div>
   </div>
 </div>
       <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>Copyright (c) 2022-2023 Mikhail Titov</span><span
                 class="pull-right"><span>Generated by </span><a
                 href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
