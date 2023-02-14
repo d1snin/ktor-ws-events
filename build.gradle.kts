@@ -22,8 +22,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
-    id("java-library")
-    id("maven-publish")
     id("org.jetbrains.dokka")
     id("com.github.ben-manes.versions")
 }
