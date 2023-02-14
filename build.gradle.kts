@@ -17,7 +17,7 @@
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
-import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -43,7 +43,6 @@ allprojects {
 
     apply {
         plugin("org.jetbrains.kotlin.jvm")
-        plugin("org.jetbrains.dokka")
     }
 
     val projectGroup: String by project
@@ -70,34 +69,43 @@ allprojects {
         implementation("ch.qos.logback:logback-classic:$logbackVersion")
     }
 
+    kotlin {
+        explicitApi()
+    }
+
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = JavaVersion.VERSION_17.majorVersion
         }
     }
 
-    tasks.withType<DokkaTask> {
-        dokkaSourceSets {
-            configureEach {
-                val moduleDocsPath: String by project
+    val dokkaExcludedModules = listOf("e2e")
 
-                includes.setFrom(moduleDocsPath)
+    if(project.name !in dokkaExcludedModules) {
+        apply {
+            plugin("org.jetbrains.dokka")
+        }
+
+        tasks.withType<DokkaTaskPartial> {
+            dokkaSourceSets {
+                configureEach {
+                    val moduleDocsPath: String by project
+
+                    includes.setFrom(moduleDocsPath)
+                }
+            }
+
+            pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+                footerMessage = "Copyright (c) 2022-2023 Mikhail Titov"
             }
         }
 
-        pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
-            footerMessage = "Copyright (c) 2022-2023 Mikhail Titov"
+        tasks.withType<DokkaMultiModuleTask> {
+            includes.setFrom("README.md")
+
+            pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+                footerMessage = "Copyright (c) 2022-2023 Mikhail Titov"
+            }
         }
-    }
-
-    tasks.withType<DokkaMultiModuleTask> {
-        val outputDir = buildDir.resolve("dokkaMultiModule")
-
-        outputDirectory.set(outputDir)
-    }
-
-
-    kotlin {
-        explicitApi()
     }
 }
