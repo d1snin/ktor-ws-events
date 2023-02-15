@@ -46,13 +46,13 @@ allprojects {
     val projectGroup: String by project
     val projectVersion: String by project
 
+    group = projectGroup
+    version = projectVersion
+
     java {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
-    group = projectGroup
-    version = projectVersion
 
     repositories {
         mavenCentral()
@@ -93,17 +93,19 @@ allprojects {
                 }
             }
 
-            pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
-                footerMessage = "Copyright (c) 2022-2023 Mikhail Titov"
-            }
+            pluginConfiguration()
         }
+    }
+}
 
-        tasks.withType<DokkaMultiModuleTask> {
-            includes.setFrom("README.md")
+tasks.withType<DokkaMultiModuleTask> {
+    includes.setFrom("README.md")
 
-            pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
-                footerMessage = "Copyright (c) 2022-2023 Mikhail Titov"
-            }
-        }
+    pluginConfiguration()
+}
+
+fun org.jetbrains.dokka.gradle.AbstractDokkaTask.pluginConfiguration() {
+    pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+        footerMessage = "Copyright (c) 2022-2023 Mikhail Titov"
     }
 }
