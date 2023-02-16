@@ -71,11 +71,11 @@ fun HttpClient.listenToServerFailures() {
 
 ### How to contribute
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md)
+See [CONTRIBUTING.md][contribution_guide]
 
 ### Code of Conduct
 
-See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
+See [CODE_OF_CONDUCT.md][code_of_conduct]
 
 ### License
 
@@ -94,3 +94,6 @@ See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
    See the License for the specific language governing permissions and
    limitations under the License.
 ```
+
+[contribution_guide]: https://github.com/d1snin/ktor-ws-events/blob/main/CONTRIBUTING.md
+[code_of_conduct]: https://github.com/d1snin/ktor-ws-events/blob/main/CODE_OF_CONDUCT.md
