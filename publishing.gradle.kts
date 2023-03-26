@@ -40,15 +40,11 @@ configure<PublishingExtension> {
     }
 
     publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
+        if (isDevVersion) {
+            val commitShortSha = System.getenv("GIT_SHORT_COMMIT_SHA")
 
-            if (isDevVersion) {
-                val commitShortSha = System.getenv("GIT_SHORT_COMMIT_SHA")
-
-                commitShortSha?.let {
-                    version = "$version-$it"
-                }
+            commitShortSha?.let {
+                version = "$version-$it"
             }
         }
     }
