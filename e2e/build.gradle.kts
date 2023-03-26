@@ -14,16 +14,36 @@
  * limitations under the License.
  */
 
-dependencies {
-    val ktorVersion: String by project
+kotlin {
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = JavaVersion.VERSION_17.majorVersion
+        }
+    }
 
-    testImplementation(project(":ktor-ws-events-server"))
-    testImplementation(project(":ktor-ws-events-client"))
+    sourceSets {
+        val jvmTest by getting {
+            dependencies {
+                val ktorVersion: String by project
 
-    testImplementation(kotlin("test-junit"))
-    
-    testImplementation("io.ktor:ktor-server-netty:$ktorVersion")
-    testImplementation("io.ktor:ktor-client-cio:$ktorVersion")
-    testImplementation("io.ktor:ktor-client-websockets:$ktorVersion")
-    testImplementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
+                val kmLogVersion: String by project
+                val logbackVersion: String by project
+
+                implementation("org.lighthousegames:logging:$kmLogVersion")
+                implementation("ch.qos.logback:logback-classic:$logbackVersion")
+
+                implementation(project(":ktor-ws-events-server"))
+                implementation(project(":ktor-ws-events-client"))
+
+                implementation(kotlin("test-junit"))
+
+                implementation("io.ktor:ktor-server-netty:$ktorVersion")
+                implementation("io.ktor:ktor-client-cio:$ktorVersion")
+                implementation("io.ktor:ktor-client-websockets:$ktorVersion")
+                implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
+            }
+        }
+    }
 }
+
+

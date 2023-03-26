@@ -18,4 +18,4 @@ jobs:
           cache: 'gradle'
 
       - name: Run End-to-End tests
-        run: ./gradlew e2e:test
+        run: ./gradlew e2e:jvmTest

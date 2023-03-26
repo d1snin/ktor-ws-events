@@ -18,10 +18,10 @@ import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    kotlin("jvm")
+    kotlin("multiplatform")
     id("org.jetbrains.dokka")
     id("com.github.ben-manes.versions")
 }
@@ -40,7 +40,7 @@ allprojects {
     }
 
     apply {
-        plugin("org.jetbrains.kotlin.jvm")
+        plugin("org.jetbrains.kotlin.multiplatform")
     }
 
     val projectGroup: String by project
@@ -49,39 +49,25 @@ allprojects {
     group = projectGroup
     version = projectVersion
 
-    java {
-        withSourcesJar()
-
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
     repositories {
         mavenCentral()
     }
 
-    dependencies {
-        val kmLogVersion: String by project
-        val logbackVersion: String by project
-
-        implementation(kotlin("stdlib"))
-        implementation("org.lighthousegames:logging:$kmLogVersion")
-        implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    }
-
-    kotlin {
-        explicitApi()
-    }
-
-    tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_17.majorVersion
+    tasks.withType<Test> {
+        testLogging {
+            events.addAll(
+                listOf(
+                    TestLogEvent.FAILED,
+                    TestLogEvent.PASSED,
+                    TestLogEvent.SKIPPED
+                )
+            )
         }
     }
 
     val dokkaExcludedModules = listOf("e2e")
 
-    if(project.name !in dokkaExcludedModules) {
+    if (project.name !in dokkaExcludedModules) {
         apply {
             plugin("org.jetbrains.dokka")
         }
@@ -97,6 +83,23 @@ allprojects {
 
             pluginConfiguration()
         }
+    }
+
+    kotlin {
+        explicitApi()
+    }
+}
+
+kotlin {
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = JavaVersion.VERSION_17.majorVersion
+        }
+    }
+
+    js(IR) {
+        browser()
+        nodejs()
     }
 }
 

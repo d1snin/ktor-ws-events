@@ -20,11 +20,30 @@ apply {
     from(publishingScript)
 }
 
-dependencies {
-    val ktorVersion: String by project
 
-    api(project(":ktor-ws-events-commons"))
+kotlin {
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = JavaVersion.VERSION_17.majorVersion
+        }
+    }
 
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-websockets:$ktorVersion")
+    js(IR) {
+        browser()
+        nodejs()
+    }
+
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                val ktorVersion: String by project
+
+                api(project(":ktor-ws-events-commons"))
+
+                implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-websockets:$ktorVersion")
+            }
+        }
+    }
 }
+

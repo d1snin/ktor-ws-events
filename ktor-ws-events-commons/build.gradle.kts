@@ -20,8 +20,25 @@ apply {
     from(publishingScript)
 }
 
-dependencies {
-    val ktorVersion: String by project
+kotlin {
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = JavaVersion.VERSION_17.majorVersion
+        }
+    }
 
-    api("io.ktor:ktor-websockets:$ktorVersion")
+    js(IR) {
+        browser()
+        nodejs()
+    }
+
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                val ktorVersion: String by project
+
+                api("io.ktor:ktor-websockets:$ktorVersion")
+            }
+        }
+    }
 }

@@ -20,12 +20,29 @@ apply {
     from(publishingScript)
 }
 
-dependencies {
-    val ktorVersion: String by project
+kotlin {
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = JavaVersion.VERSION_17.majorVersion
+        }
+    }
 
-    api(project(":ktor-ws-events-commons"))
+    sourceSets {
+        val jvmMain by getting {
+            dependencies {
+                val ktorVersion: String by project
 
-    implementation("io.ktor:ktor-server-core:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
-    api("io.ktor:ktor-server-websockets:$ktorVersion")
+                val kmLogVersion: String by project
+
+                implementation("org.lighthousegames:logging:$kmLogVersion")
+
+                api(project(":ktor-ws-events-commons"))
+
+                implementation("io.ktor:ktor-server-core:$ktorVersion")
+                implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
+                api("io.ktor:ktor-server-websockets:$ktorVersion")
+            }
+        }
+    }
 }
+
