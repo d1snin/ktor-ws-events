@@ -23,8 +23,6 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 
 const val TEST_SERVER_PORT = 9639
 
