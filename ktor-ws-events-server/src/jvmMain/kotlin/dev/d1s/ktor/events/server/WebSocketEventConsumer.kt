@@ -17,7 +17,6 @@
 package dev.d1s.ktor.events.server
 
 import dev.d1s.ktor.events.commons.WebSocketEvent
-import io.ktor.server.application.*
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,6 +31,8 @@ internal interface WebSocketEventConsumer {
     fun launch(eventReceivingScope: CoroutineScope, channel: WebSocketEventReceiver)
 
     fun addConnection(connection: WebSocketEventSendingConnection)
+
+    fun removeConnection(connection: WebSocketEventSendingConnection)
 }
 
 internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
@@ -62,6 +63,10 @@ internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
         connectionPool += connection
     }
 
+    override fun removeConnection(connection: WebSocketEventSendingConnection) {
+        connectionPool -= connection
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun WebSocketEventSendingConnection?.sendEvent(event: WebSocketEvent<*>) {
         log.d {
@@ -69,7 +74,7 @@ internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
         }
 
         (this?.session as? WebSocketServerSession)?.let { session ->
-            if (!session.incoming.isClosedForReceive) {
+            if (!session.outgoing.isClosedForSend) {
                 session.sendSerialized(event)
             } else {
                 connectionPool -= event.reference

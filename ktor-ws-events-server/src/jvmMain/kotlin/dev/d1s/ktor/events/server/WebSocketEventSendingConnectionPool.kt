@@ -60,7 +60,7 @@ internal class DefaultWebSocketEventSendingConnectionPool : WebSocketEventSendin
     }
 
     override fun get(reference: EventReference): WebSocketEventSendingConnection? {
-        log.v {
+        log.d {
             "Finding connection in $connections by reference $reference"
         }
 

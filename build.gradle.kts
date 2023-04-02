@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
-import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     kotlin("multiplatform")
@@ -57,9 +57,11 @@ allprojects {
         testLogging {
             events.addAll(
                 listOf(
-                    TestLogEvent.FAILED,
                     TestLogEvent.PASSED,
-                    TestLogEvent.SKIPPED
+                    TestLogEvent.FAILED,
+                    TestLogEvent.SKIPPED,
+                    TestLogEvent.STANDARD_OUT,
+                    TestLogEvent.STANDARD_ERROR,
                 )
             )
         }

@@ -57,9 +57,12 @@ private val log = logging()
  */
 public val WebSocketEvents: ApplicationPlugin<WebSocketEventsConfiguration> =
     createApplicationPlugin(WEBSOCKET_EVENTS_PLUGIN_NAME, ::WebSocketEventsConfiguration) {
-        log.v {
+        log.d {
             "Installing WebSocketEvents plugin"
         }
+
+        val eventReceivingScope = pluginConfig.eventReceivingScope
+        val channel = pluginConfig.requiredChannel
 
         if (!application.hasWebSocketsPlugin()) {
             application.installWebSockets()
@@ -68,9 +71,6 @@ public val WebSocketEvents: ApplicationPlugin<WebSocketEventsConfiguration> =
         val webSocketEventConsumer = webSocketEventConsumer().apply {
             application.attributes.webSocketEventConsumer = this
         }
-
-        val eventReceivingScope = pluginConfig.eventReceivingScope
-        val channel = pluginConfig.requiredChannel
 
         webSocketEventConsumer.launch(eventReceivingScope, channel)
     }
