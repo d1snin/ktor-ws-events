@@ -49,7 +49,9 @@ fun handleServerFailure(failure: ServerFailure) {
 
 ```kotlin
 fun HttClient.configureWebSocketEvents() {
-    install(WebSockets)
+    install(WebSockets) {
+        contentConverter = KotlinxWebsocketSerializationConverter(Json)
+    }
     
     install(WebSocketEvents) {
         host = "example.com"
