@@ -16,6 +16,8 @@
 
 package dev.d1s.ktor.events.commons
 
+import kotlinx.serialization.Serializable
+
 /**
  * Example usage:
  * ```kotlin
@@ -29,6 +31,7 @@ package dev.d1s.ktor.events.commons
  * @see event
  * @see ref
  */
+@Serializable
 public data class WebSocketEvent<T>(
     val reference: EventReference,
     val data: T

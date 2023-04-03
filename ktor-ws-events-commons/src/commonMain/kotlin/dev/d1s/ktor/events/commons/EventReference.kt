@@ -16,6 +16,8 @@
 
 package dev.d1s.ktor.events.commons
 
+import kotlinx.serialization.Serializable
+
 /**
  * Event group is used to combine events of the same type.
  * For example: "book_updated" or "book_created".
@@ -53,6 +55,7 @@ public typealias EventPrincipal = String?
  * @see EventPrincipal
  * @see ref
  */
+@Serializable
 public data class EventReference(
     val group: EventGroup,
     val principal: EventPrincipal = null
