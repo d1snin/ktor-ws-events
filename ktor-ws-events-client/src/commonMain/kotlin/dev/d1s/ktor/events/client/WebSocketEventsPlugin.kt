@@ -32,23 +32,15 @@ public val WebSocketEvents: ClientPlugin<WebSocketEventsConfiguration> =
 
 public class WebSocketEventsConfiguration {
 
-    public var host: String? = null
+    public var url: String? = null
 
-    public var port: Int? = null
-
-    internal val requiredHost
-        get() = requireNotNull(host) {
-            "Host is not configured."
-        }
-
-    internal val requiredPort
-        get() = requireNotNull(port) {
-            "Port is not configured."
+    internal val requiredBaseUrl
+        get() = requireNotNull(url) {
+            "URL is not configured."
         }
 
     internal fun validate() {
-        requiredHost
-        requiredPort
+        requiredBaseUrl
     }
 }
 

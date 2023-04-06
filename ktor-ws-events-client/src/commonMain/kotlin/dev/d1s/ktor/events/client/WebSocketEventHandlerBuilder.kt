@@ -23,6 +23,7 @@ import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 
 /**
  * Opens a [block] with [DefaultClientWebSocketSession] associated with the given [event reference][reference] and optional [path].
@@ -53,10 +54,12 @@ public suspend fun HttpClient.webSocketEvents(
         parameter(Routes.PRINCIPAL_QUERY_PARAMETER, reference.principal)
     }
 
+    val url = URLBuilder(webSocketEventsConfiguration.requiredBaseUrl).apply {
+        path(path)
+    }.buildString()
+
     webSocket(
-        host = webSocketEventsConfiguration.requiredHost,
-        port = webSocketEventsConfiguration.requiredPort,
-        path = path,
+        urlString = url,
         request = requestConfiguration
     ) {
         block()
