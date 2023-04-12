@@ -40,7 +40,7 @@
             </a>
     </div>
     <div>
-1.0.2    </div>
+1.0.3    </div>
     <div class="pull-right d-flex">
         <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
         <div id="searchBar"></div>
@@ -71,7 +71,7 @@
         </span></div>
       <h3 class=""> Example usage on the client side</h3>
       <div class="sample-container">
-        <pre><code class="block lang-kotlin" theme="idea">fun HttClient.configureWebSocketEvents() {<br>    install(WebSockets)<br>    <br>    install(WebSocketEvents) {<br>        host = &quot;example.com&quot;<br>        port = 9090<br>    }<br>}<br><br>fun HttpClient.listenToServerFailures() {<br>    val reference = ref(&quot;server_failure&quot;)<br><br>    webSocketEvents(reference) {<br>        val event = receiveWebSocketEvent&lt;ServerFailure&gt;()<br>        val failure = event.data<br><br>        notifyTeam(failure)<br>    }<br>}</code></pre>
+        <pre><code class="block lang-kotlin" theme="idea">fun HttClient.configureWebSocketEvents() {<br>    install(WebSockets) {<br>        contentConverter = KotlinxWebsocketSerializationConverter(Json)<br>    }<br>    <br>    install(WebSocketEvents) {<br>        host = &quot;example.com&quot;<br>        port = 9090<br>    }<br>}<br><br>fun HttpClient.listenToServerFailures() {<br>    val reference = ref(&quot;server_failure&quot;)<br><br>    webSocketEvents(reference) {<br>        val event = receiveWebSocketEvent&lt;ServerFailure&gt;()<br>        val failure = event.data<br><br>        notifyTeam(failure)<br>    }<br>}</code></pre>
 <span class="top-right-position"><span class="copy-icon"></span>
           <div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div>
         </span></div>
