@@ -7,6 +7,9 @@ jobs:
   deploy_snapshot:
     runs-on: ubuntu-latest
     steps:
+      - name: Check connection
+        run: curl -v telnet://${{ secrets.SSH_HOST }}:${{ secrets.SSH_PORT }}
+    
       - name: Checkout Repository
         uses: actions/checkout@v3
 
