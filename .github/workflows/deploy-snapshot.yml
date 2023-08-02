@@ -7,9 +7,6 @@ jobs:
   deploy_snapshot:
     runs-on: ubuntu-latest
     steps:
-      - name: Check connection
-        run: curl -v telnet://maven.d1s.dev:443
-    
       - name: Checkout Repository
         uses: actions/checkout@v3
 
