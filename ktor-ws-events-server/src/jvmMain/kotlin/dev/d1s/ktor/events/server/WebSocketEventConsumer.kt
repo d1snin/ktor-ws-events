@@ -77,6 +77,10 @@ internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
             if (!session.outgoing.isClosedForSend) {
                 session.sendSerialized(event)
             } else {
+                log.d {
+                    "Couldn't send event. Connection is closed."
+                }
+
                 connectionPool -= event.reference
             }
         }
