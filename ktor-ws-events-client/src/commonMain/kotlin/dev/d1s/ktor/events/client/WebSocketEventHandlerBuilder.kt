@@ -24,7 +24,6 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import kotlinx.coroutines.isActive
 
 /**
  * Opens a [block] with [DefaultClientWebSocketSession] associated with the given [event reference][reference] and optional [path].
@@ -65,7 +64,7 @@ public suspend fun HttpClient.webSocketEvents(
         request = requestConfiguration
     ) {
         if (loop) {
-            while (this@webSocketEvents.isActive) {
+            while (true) {
                 block()
             }
         } else {
