@@ -70,6 +70,12 @@ public fun Route.webSocketEvents(route: String = Routes.DEFAULT_EVENTS_ROUTE) {
 
         while (receiving) {
             incoming.receiveCatching().getOrElse {
+                log.w {
+                    "Failed to receive"
+                }
+
+                it?.printStackTrace()
+
                 consumer.removeConnection(connection)
 
                 receiving = false
