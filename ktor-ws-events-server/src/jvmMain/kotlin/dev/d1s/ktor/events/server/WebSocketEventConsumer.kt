@@ -19,7 +19,7 @@ package dev.d1s.ktor.events.server
 import dev.d1s.ktor.events.commons.WebSocketEvent
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import org.lighthousegames.logging.logging
@@ -67,7 +67,7 @@ internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
         connectionPool -= connection
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(DelicateCoroutinesApi::class)
     private suspend fun WebSocketEventSendingConnection?.sendEvent(event: WebSocketEvent<*>) {
         log.d {
             "Sending event... Connection: $this"
