@@ -65,7 +65,7 @@ public suspend fun HttpClient.webSocketEvents(
         request = requestConfiguration
     ) {
         if (loop) {
-            while (isActive) {
+            while (this@webSocketEvents.isActive) {
                 block()
             }
         } else {
