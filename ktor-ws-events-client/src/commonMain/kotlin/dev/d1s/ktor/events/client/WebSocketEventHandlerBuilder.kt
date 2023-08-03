@@ -64,7 +64,7 @@ public suspend fun HttpClient.webSocketEvents(
         request = requestConfiguration
     ) {
         if (loop) {
-            while (true) {
+            for (frame in incoming) {
                 block()
             }
         } else {
