@@ -61,7 +61,7 @@ class EventDeliveryTest {
     }
 
     private suspend fun listenForTestEvent(block: (WebSocketEvent<TestEventData>) -> Unit) {
-        webSocketClient.webSocketEvents(testClientEventReference, loop = false) {
+        webSocketClient.webSocketEvents(testClientEventReference) {
             val event = receiveWebSocketEvent<TestEventData>()
 
             block(event)

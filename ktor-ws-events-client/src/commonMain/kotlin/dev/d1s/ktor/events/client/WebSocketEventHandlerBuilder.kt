@@ -44,7 +44,6 @@ import io.ktor.http.*
 public suspend fun HttpClient.webSocketEvents(
     reference: EventReference,
     path: String = makeDefaultEventsRoute(reference.group),
-    loop: Boolean = true,
     block: suspend DefaultClientWebSocketSession.() -> Unit
 ) {
     checkPluginInstalled()
@@ -61,16 +60,9 @@ public suspend fun HttpClient.webSocketEvents(
 
     webSocket(
         urlString = url,
-        request = requestConfiguration
-    ) {
-        if (loop) {
-            for (frame in incoming) {
-                block()
-            }
-        } else {
-            block()
-        }
-    }
+        request = requestConfiguration,
+        block = block
+    )
 }
 
 private fun makeDefaultEventsRoute(group: EventGroup) =
