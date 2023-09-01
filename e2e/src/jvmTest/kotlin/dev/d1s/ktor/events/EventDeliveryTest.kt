@@ -16,13 +16,13 @@
 
 package dev.d1s.ktor.events
 
+import dev.d1s.ktor.events.client.ClientWebSocketEvent
 import dev.d1s.ktor.events.client.receiveWebSocketEvent
 import dev.d1s.ktor.events.client.webSocketEvents
-import dev.d1s.ktor.events.commons.WebSocketEvent
-import dev.d1s.ktor.events.commons.event
 import dev.d1s.ktor.events.configuration.eventChannel
 import dev.d1s.ktor.events.configuration.runTestServer
 import dev.d1s.ktor.events.configuration.webSocketClient
+import dev.d1s.ktor.events.server.event
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -30,6 +30,7 @@ import org.lighthousegames.logging.logging
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class EventDeliveryTest {
 
@@ -49,7 +50,7 @@ class EventDeliveryTest {
                         "Received test event: $event"
                     }
 
-                    assertEquals(testServerEventReference, event.reference)
+                    assertEquals(event.reference, testServerEventReference)
                     assertEquals(testEventData.message, event.data.message)
                 }
             }
@@ -60,7 +61,7 @@ class EventDeliveryTest {
         }
     }
 
-    private suspend fun listenForTestEvent(block: (WebSocketEvent<TestEventData>) -> Unit) {
+    private suspend fun listenForTestEvent(block: (ClientWebSocketEvent<TestEventData>) -> Unit) {
         webSocketClient.webSocketEvents(testClientEventReference) {
             val event = receiveWebSocketEvent<TestEventData>()
 
@@ -69,7 +70,14 @@ class EventDeliveryTest {
     }
 
     private suspend fun sendTestEvent() {
-        val event = event(testServerEventReference, testEventData)
+        val event = event(testServerEventReference) { parameters ->
+            val testParameterData = parameters[TEST_CLIENT_PARAMETER_KEY]
+
+            assertNotNull(testParameterData)
+            assertEquals(TEST_CLIENT_PARAMETER_DATA, testParameterData)
+
+            testEventData
+        }
 
         eventChannel.send(event)
     }

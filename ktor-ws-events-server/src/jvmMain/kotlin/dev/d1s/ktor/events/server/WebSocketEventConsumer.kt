@@ -16,7 +16,6 @@
 
 package dev.d1s.ktor.events.server
 
-import dev.d1s.ktor.events.commons.WebSocketEvent
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -24,7 +23,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import org.lighthousegames.logging.logging
 
-internal typealias WebSocketEventReceiver = ReceiveChannel<WebSocketEvent<*>>
+internal typealias WebSocketEventReceiver = ReceiveChannel<ServerWebSocketEvent>
 
 internal interface WebSocketEventConsumer {
 
@@ -68,20 +67,25 @@ internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private suspend fun WebSocketEventSendingConnection?.sendEvent(event: WebSocketEvent<*>) {
+    private suspend fun WebSocketEventSendingConnection?.sendEvent(event: ServerWebSocketEvent) {
         log.d {
             "Sending event... Connection: $this"
         }
 
         (this?.session as? WebSocketServerSession)?.let { session ->
             if (!session.outgoing.isClosedForSend) {
-                session.sendSerialized(event)
+                val dto = WebSocketEventDto(
+                    reference = reference,
+                    data = event.dataSupplier(reference.parameters)
+                )
+
+                session.sendSerialized(dto)
             } else {
                 log.d {
                     "Couldn't send event. Connection is closed."
                 }
 
-                connectionPool -= event.reference
+                connectionPool -= reference
             }
         }
     }

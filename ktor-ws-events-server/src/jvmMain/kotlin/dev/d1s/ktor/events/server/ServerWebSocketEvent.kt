@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package dev.d1s.ktor.events.commons
+package dev.d1s.ktor.events.server
 
-import kotlinx.serialization.Serializable
+import dev.d1s.ktor.events.commons.ClientParameters
+import dev.d1s.ktor.events.commons.EventReference
+
+public typealias EventDataSupplier = suspend (ClientParameters) -> Any
 
 /**
  * Example usage:
@@ -24,22 +27,23 @@ import kotlinx.serialization.Serializable
  * val reference = ref("book_created")
  * val createdBook: Book = createBook()
  *
- * val event = event(reference, createdBook)
+ * val event = event(reference) { _ ->
+ *     createdBook
+ * }
  * ```
  *
- * @param data Any data associated with this [WebSocketEvent].
  * @see event
- * @see ref
+ * @see dev.d1s.ktor.events.commons.ref
  */
-@Serializable
-public data class WebSocketEvent<T>(
+public data class ServerWebSocketEvent(
     val reference: EventReference,
-    val data: T
+    val dataSupplier: EventDataSupplier
 )
 
 /**
- * A shortcut. Returns `WebSocketEvent(reference, data)`
+ * A shortcut. Returns `ServerWebSocketEvent(reference, data)`
  *
- * @see WebSocketEvent
+ * @see ServerWebSocketEvent
  */
-public fun <T> event(reference: EventReference, data: T): WebSocketEvent<T> = WebSocketEvent(reference, data)
+public fun event(reference: EventReference, dataSupplier: EventDataSupplier): ServerWebSocketEvent =
+    ServerWebSocketEvent(reference, dataSupplier)

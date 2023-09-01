@@ -16,13 +16,12 @@
 
 package dev.d1s.ktor.events.client
 
-import dev.d1s.ktor.events.commons.WebSocketEvent
 import io.ktor.client.plugins.websocket.*
 
 /**
- * Dequeues a frame containing [WebSocketEvent] and tries to deserialize it.
+ * Dequeues a frame containing [ClientWebSocketEvent] and tries to deserialize it.
  *
  * @see webSocketEvents
  */
-public suspend inline fun <reified T> DefaultClientWebSocketSession.receiveWebSocketEvent(): WebSocketEvent<T> =
+public suspend inline fun <reified T> DefaultClientWebSocketSession.receiveWebSocketEvent(): ClientWebSocketEvent<T> =
     receiveDeserialized()

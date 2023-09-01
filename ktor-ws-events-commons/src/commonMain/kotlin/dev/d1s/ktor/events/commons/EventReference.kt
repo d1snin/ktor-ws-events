@@ -44,7 +44,14 @@ public typealias EventGroup = String
 public typealias EventPrincipal = String?
 
 /**
- * Event reference acts as an identifier for a [WebSocketEvent].
+ * Client parameters passed to the server.
+ * The parameters are only scoped to the connection.
+ * When firing an event, server can handle them.
+ */
+public typealias ClientParameters = Map<String, String>
+
+/**
+ * Event reference acts as a type for all events.
  *
  * Example usage:
  * ```kotlin
@@ -53,12 +60,14 @@ public typealias EventPrincipal = String?
  *
  * @see EventGroup
  * @see EventPrincipal
+ * @see ClientParameters
  * @see ref
  */
 @Serializable
 public data class EventReference(
     val group: EventGroup,
-    val principal: EventPrincipal = null
+    val principal: EventPrincipal = null,
+    val parameters: ClientParameters = mapOf()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -89,8 +98,13 @@ public data class EventReference(
 }
 
 /**
- * A shortcut. Returns `EventReference(group, principal)`
+ * A shortcut. Returns `EventReference(group, principal, parameters)`
  *
  * @see EventReference
+ * @see ClientParameters
  */
-public fun ref(group: EventGroup, principal: EventPrincipal = null): EventReference = EventReference(group, principal)
+public fun ref(
+    group: EventGroup,
+    principal: EventPrincipal = null,
+    clientParameters: ClientParameters = mapOf()
+): EventReference = EventReference(group, principal, clientParameters)

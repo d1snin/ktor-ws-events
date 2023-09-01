@@ -16,7 +16,6 @@
 
 package dev.d1s.ktor.events.server
 
-import dev.d1s.ktor.events.commons.WebSocketEvent
 import kotlinx.coroutines.channels.SendChannel
 
-public typealias WebSocketEventSender = SendChannel<WebSocketEvent<*>>
+public typealias WebSocketEventSender = SendChannel<ServerWebSocketEvent>

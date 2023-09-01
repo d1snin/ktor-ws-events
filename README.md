@@ -39,7 +39,9 @@ fun Application.configureWebSocketEvents() {
 
 fun handleServerFailure(failure: ServerFailure) {
     val reference = ref("server_failure")
-    val event = event(reference, failure)
+    val event = event(reference) {
+        failure
+    }
 
     eventChannel.send(event)
 }

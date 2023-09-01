@@ -28,7 +28,7 @@ private val log = logging()
 
 /**
  * Installs a WebSocket route to your application which is
- * supposed to propagate [WebSocketEvents][dev.d1s.ktor.events.commons.WebSocketEvent] to clients.
+ * supposed to propagate events to clients.
  * **This function is supposed to be called once.**
  *
  * @throws IllegalArgumentException if the provided route does not container group segment placeholder.
@@ -53,9 +53,24 @@ public fun Route.webSocketEvents(route: String = Routes.DEFAULT_EVENTS_ROUTE) {
             "Handled WS session"
         }
 
+        val queryParameters = call.request.queryParameters
+
+        val parameters = buildMap {
+            queryParameters.forEach { key, values ->
+                if (key != Routes.PRINCIPAL_QUERY_PARAMETER) {
+                    put(key, values.first())
+                }
+            }
+        }
+
+        log.d {
+            "Parameters: $parameters"
+        }
+
         val eventReference = EventReference(
             call.parameters[Routes.GROUP_PATH_PARAMETER] ?: error("Group parameter is not present."),
-            call.request.queryParameters[Routes.PRINCIPAL_QUERY_PARAMETER]
+            queryParameters[Routes.PRINCIPAL_QUERY_PARAMETER],
+            parameters
         )
 
         log.d {

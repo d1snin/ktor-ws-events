@@ -52,6 +52,14 @@ public suspend fun HttpClient.webSocketEvents(
 
     val requestConfiguration: HttpRequestBuilder.() -> Unit = {
         parameter(Routes.PRINCIPAL_QUERY_PARAMETER, reference.principal)
+
+        val parameters = Parameters.build {
+            reference.parameters.forEach { (key, value) ->
+                append(key, value)
+            }
+        }
+
+        url.parameters.appendMissing(parameters)
     }
 
     val url = URLBuilder(webSocketEventsConfiguration.requiredBaseUrl).apply {

@@ -30,9 +30,9 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             dependencies {
-                val ktorVersion: String by project
-
                 val kmLogVersion: String by project
+
+                val ktorVersion: String by project
 
                 implementation("org.lighthousegames:logging:$kmLogVersion")
 

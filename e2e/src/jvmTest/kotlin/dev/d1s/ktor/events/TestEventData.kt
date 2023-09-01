@@ -20,11 +20,22 @@ import dev.d1s.ktor.events.commons.ref
 
 const val TEST_MESSAGE = "Hello, World!"
 
+const val TEST_CLIENT_PARAMETER_KEY = "test"
+const val TEST_CLIENT_PARAMETER_DATA = "test"
+
 data class TestEventData(
     val message: String
 )
 
 val testEventData = TestEventData(TEST_MESSAGE)
 
-val testServerEventReference = ref("test_group", "test_principal")
-val testClientEventReference = ref("test_group", null)
+val testServerEventReference = ref(
+    group = "test_group",
+    principal = "test_principal"
+)
+
+val testClientEventReference = ref(
+    group = "test_group",
+    principal = null,
+    clientParameters = mapOf(TEST_CLIENT_PARAMETER_KEY to TEST_CLIENT_PARAMETER_DATA)
+)
