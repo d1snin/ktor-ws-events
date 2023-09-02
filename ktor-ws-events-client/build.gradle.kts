@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+plugins {
+    kotlin("plugin.serialization")
+}
+
 apply {
     val publishingScript: String by project
 
@@ -38,10 +42,14 @@ kotlin {
             dependencies {
                 val ktorVersion: String by project
 
+                val kotlinxSerializationVersion: String by project
+
                 api(project(":ktor-ws-events-commons"))
 
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
                 implementation("io.ktor:ktor-client-websockets:$ktorVersion")
+
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
             }
         }
     }
