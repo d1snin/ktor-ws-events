@@ -19,6 +19,7 @@ package dev.d1s.ktor.events.server
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import org.lighthousegames.logging.logging
@@ -46,15 +47,7 @@ internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
         }
 
         eventReceivingScope.launch {
-            for (event in channel) {
-                log.d {
-                    "Consumed event $event"
-                }
-
-                val connection = connectionPool[event.reference]
-
-                connection.sendEvent(event)
-            }
+            handleEvents(eventReceivingScope, channel)
         }
     }
 
@@ -66,27 +59,61 @@ internal class DefaultWebSocketEventConsumer : WebSocketEventConsumer {
         connectionPool -= connection
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    private suspend fun WebSocketEventSendingConnection?.sendEvent(event: ServerWebSocketEvent) {
+    private suspend fun handleEvents(eventReceivingScope: CoroutineScope, channel: WebSocketEventReceiver) {
+        for (event in channel) {
+            log.d {
+                "Consumed event $event"
+            }
+
+            processEvent(eventReceivingScope, event)
+        }
+    }
+
+    private fun processEvent(eventReceivingScope: CoroutineScope, event: ServerWebSocketEvent) {
+        val connections = connectionPool[event.reference]
+
+        connections.parallelStream().forEach { connection ->
+            eventReceivingScope.launch {
+                connection.sendEvent(event)
+            }
+        }
+    }
+
+    private suspend fun WebSocketEventSendingConnection.sendEvent(event: ServerWebSocketEvent) {
         log.d {
             "Sending event... Connection: $this"
         }
 
-        (this?.session as? WebSocketServerSession)?.let { session ->
-            if (!session.outgoing.isClosedForSend) {
-                val dto = WebSocketEventDto(
-                    reference = reference,
-                    data = event.dataSupplier(reference.parameters)
-                )
-
-                session.sendSerialized(dto)
-            } else {
-                log.d {
-                    "Couldn't send event. Connection is closed."
-                }
-
-                connectionPool -= reference
-            }
+        (session as? WebSocketServerSession)?.let { session ->
+            processSession(session, event)
         }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private suspend fun WebSocketEventSendingConnection.processSession(
+        session: WebSocketServerSession,
+        event: ServerWebSocketEvent
+    ) {
+        if (!session.outgoing.isClosedForSend) {
+            sendEventDto(session, event)
+        } else {
+            log.d {
+                "Couldn't send event. Connection is closed."
+            }
+
+            connectionPool -= reference
+        }
+    }
+
+    private suspend fun WebSocketEventSendingConnection.sendEventDto(
+        session: WebSocketServerSession,
+        event: ServerWebSocketEvent
+    ) {
+        val dto = WebSocketEventDto(
+            reference = reference,
+            data = event.dataSupplier(reference.parameters)
+        )
+
+        session.sendSerialized(dto)
     }
 }

@@ -26,7 +26,7 @@ internal interface WebSocketEventSendingConnectionPool {
 
     operator fun minusAssign(connection: WebSocketEventSendingConnection)
 
-    operator fun get(reference: EventReference): WebSocketEventSendingConnection?
+    operator fun get(reference: EventReference): List<WebSocketEventSendingConnection>
 
     operator fun minusAssign(reference: EventReference)
 }
@@ -54,24 +54,26 @@ internal class DefaultWebSocketEventSendingConnectionPool : WebSocketEventSendin
     }
 
     override fun minusAssign(reference: EventReference) {
-        this[reference]?.let {
-            this -= it
+        val connections = this[reference]
+
+        connections.forEach { connection ->
+            this -= connection
         }
     }
 
-    override fun get(reference: EventReference): WebSocketEventSendingConnection? {
+    override fun get(reference: EventReference): List<WebSocketEventSendingConnection> {
         log.d {
-            "Finding connection in $connections by reference $reference"
+            "Filtering connections $connections by reference $reference"
         }
 
-        val connection = connections.find {
+        val connections = connections.filter {
             it.reference == reference
         }
 
         log.d {
-            "Found connection $connection. Wanted a connection with reference $reference"
+            "Found connections $connections. Wanted connections with reference $reference"
         }
 
-        return connection
+        return connections
     }
 }
