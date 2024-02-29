@@ -35,7 +35,7 @@ private val log = logging()
  * @throws IllegalStateException if the application does not have [WebSocketEvents] plugin installed.
  * @see WebSocketEvents
  */
-public fun Route.webSocketEvents(route: String = Routes.DEFAULT_EVENTS_ROUTE) {
+public fun Route.webSocketEvents(route: String = Routes.DEFAULT_EVENTS_ROUTE, preprocess: suspend DefaultWebSocketServerSession.(EventReference) -> Unit) {
     log.d {
         "Exposing route $route"
     }
@@ -76,6 +76,8 @@ public fun Route.webSocketEvents(route: String = Routes.DEFAULT_EVENTS_ROUTE) {
         log.d {
             "Extracted event reference: $eventReference"
         }
+
+        preprocess(eventReference)
 
         val connection = WebSocketEventSendingConnection(eventReference, this)
 
