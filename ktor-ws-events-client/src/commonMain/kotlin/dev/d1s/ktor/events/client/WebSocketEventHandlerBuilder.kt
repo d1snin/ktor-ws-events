@@ -16,7 +16,6 @@
 
 package dev.d1s.ktor.events.client
 
-import dev.d1s.ktor.events.commons.EventGroup
 import dev.d1s.ktor.events.commons.EventReference
 import dev.d1s.ktor.events.commons.util.Routes
 import io.ktor.client.*
@@ -43,7 +42,7 @@ import io.ktor.http.*
  */
 public suspend fun HttpClient.webSocketEvents(
     reference: EventReference,
-    path: String = makeDefaultEventsRoute(reference.group),
+    path: String = Routes.DEFAULT_EVENTS_ROUTE,
     block: suspend DefaultClientWebSocketSession.() -> Unit
 ) {
     checkPluginInstalled()
@@ -63,7 +62,8 @@ public suspend fun HttpClient.webSocketEvents(
     }
 
     val url = URLBuilder(webSocketEventsConfiguration.requiredBaseUrl).apply {
-        path(path)
+        val configuredPath = path.replace(Routes.GROUP_SEGMENT_PLACEHOLDER, reference.group)
+        path(configuredPath)
     }.buildString()
 
     webSocket(
@@ -72,9 +72,6 @@ public suspend fun HttpClient.webSocketEvents(
         block = block
     )
 }
-
-private fun makeDefaultEventsRoute(group: EventGroup) =
-    Routes.DEFAULT_EVENTS_ROUTE.replace(Routes.GROUP_SEGMENT_PLACEHOLDER, group)
 
 private fun HttpClient.checkPluginInstalled() {
     pluginOrNull(WebSocketEvents) ?: error("WebSocketEvents plugin is not installed.")
