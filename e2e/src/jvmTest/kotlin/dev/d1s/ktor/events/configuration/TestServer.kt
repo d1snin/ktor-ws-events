@@ -16,24 +16,24 @@
 
 package dev.d1s.ktor.events.configuration
 
-import dev.d1s.ktor.events.server.WebSocketEventChannel
 import dev.d1s.ktor.events.server.WebSocketEvents
-import dev.d1s.ktor.events.server.webSocketEvents
+import dev.d1s.ktor.events.server.pool.InMemoryEventPool
+import dev.d1s.ktor.events.server.route.webSocketEvents
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.routing.*
 
-const val TEST_SERVER_PORT = 9639
+const val TEST_SERVER_PORT = 20324
 
-val eventChannel = WebSocketEventChannel()
+val pool = InMemoryEventPool()
 
 fun runTestServer() = embeddedServer(Netty, environment).start()
 
 private val environment = applicationEngineEnvironment {
     module {
         install(WebSocketEvents) {
-            channel = eventChannel
+            eventPool = pool
         }
 
         routing {

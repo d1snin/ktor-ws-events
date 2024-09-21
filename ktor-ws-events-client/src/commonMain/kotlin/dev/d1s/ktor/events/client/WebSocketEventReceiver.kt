@@ -17,6 +17,16 @@
 package dev.d1s.ktor.events.client
 
 import io.ktor.client.plugins.websocket.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import org.lighthousegames.logging.KmLog
+import org.lighthousegames.logging.logging
+
+public val EventReceivingScope: CoroutineScope = CoroutineScope(Dispatchers.Default)
+
+public val EventReceiverLog: KmLog = logging()
 
 /**
  * Dequeues a frame containing [ClientWebSocketEvent] and tries to deserialize it.
@@ -24,4 +34,21 @@ import io.ktor.client.plugins.websocket.*
  * @see webSocketEvents
  */
 public suspend inline fun <reified T> DefaultClientWebSocketSession.receiveWebSocketEvent(): ClientWebSocketEvent<T> =
-    receiveDeserialized()
+    receiveDeserialized<ClientWebSocketEvent<T>>()
+
+/**
+ * Dequeues frames containing [ClientWebSocketEvent] and tries to deserialize it. Will retry if something went wrong while receiving a frame.
+ *
+ * @see webSocketEvents
+ */
+public suspend inline fun <reified T> DefaultClientWebSocketSession.receiveWebSocketEvents(crossinline receiver: suspend (ClientWebSocketEvent<T>) -> Unit): Job =
+    EventReceivingScope.launch {
+        withRetries(continuous = true, onError = {
+            EventReceiverLog.w {
+                "Error receiving web socket events: ${it.message}"
+            }
+        }) {
+            val event = receiveWebSocketEvent<T>()
+            receiver(event)
+        }
+    }

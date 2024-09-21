@@ -40,11 +40,15 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                val kmLogVersion: String by project
+
                 val ktorVersion: String by project
 
                 val kotlinxSerializationVersion: String by project
 
                 api(project(":ktor-ws-events-commons"))
+
+                implementation("org.lighthousegames:logging:$kmLogVersion")
 
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
                 implementation("io.ktor:ktor-client-websockets:$ktorVersion")

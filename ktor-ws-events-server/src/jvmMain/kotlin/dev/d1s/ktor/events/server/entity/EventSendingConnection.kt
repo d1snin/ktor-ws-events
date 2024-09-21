@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package dev.d1s.ktor.events.server
+package dev.d1s.ktor.events.server.entity
 
-import kotlinx.coroutines.channels.Channel
+import dev.d1s.ktor.events.commons.EventReference
+import io.ktor.server.application.*
+import io.ktor.websocket.*
 
-/**
- * @see WebSocketEventSender
- */
-public typealias WebSocketEventChannel = Channel<ServerWebSocketEvent>
-
-public fun WebSocketEventChannel(): WebSocketEventChannel = Channel()
+public data class EventSendingConnection(
+    val reference: EventReference,
+    val session: DefaultWebSocketSession,
+    val call: ApplicationCall
+)

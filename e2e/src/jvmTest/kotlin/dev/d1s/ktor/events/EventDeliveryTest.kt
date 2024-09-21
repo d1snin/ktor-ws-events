@@ -19,10 +19,10 @@ package dev.d1s.ktor.events
 import dev.d1s.ktor.events.client.ClientWebSocketEvent
 import dev.d1s.ktor.events.client.receiveWebSocketEvent
 import dev.d1s.ktor.events.client.webSocketEvents
-import dev.d1s.ktor.events.configuration.eventChannel
+import dev.d1s.ktor.events.configuration.pool
 import dev.d1s.ktor.events.configuration.runTestServer
 import dev.d1s.ktor.events.configuration.webSocketClient
-import dev.d1s.ktor.events.server.event
+import dev.d1s.ktor.events.server.entity.event
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -71,6 +71,10 @@ class EventDeliveryTest {
 
     private suspend fun sendTestEvent() {
         val event = event(testServerEventReference) { parameters ->
+            log.i {
+                "Got parameters: $parameters"
+            }
+
             val testParameterData = parameters[TEST_CLIENT_PARAMETER_KEY]
 
             assertNotNull(testParameterData)
@@ -79,6 +83,6 @@ class EventDeliveryTest {
             testEventData
         }
 
-        eventChannel.send(event)
+        pool.push(event)
     }
 }

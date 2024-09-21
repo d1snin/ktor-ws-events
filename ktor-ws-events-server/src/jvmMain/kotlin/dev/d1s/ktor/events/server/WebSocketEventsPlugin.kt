@@ -16,11 +16,12 @@
 
 package dev.d1s.ktor.events.server
 
+import dev.d1s.ktor.events.server.pool.EventPool
+import dev.d1s.ktor.events.server.util.eventPool
+import dev.d1s.ktor.events.server.util.eventProcessor
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.websocket.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import org.lighthousegames.logging.logging
 
 internal const val WEBSOCKET_EVENTS_PLUGIN_NAME = "websocket-events"
@@ -29,31 +30,28 @@ private val log = logging()
 
 /**
  * Enables support for event streaming over WebSockets.
- * Supposed to be used in pair with [webSocketEvents] route builder.
- * Once the plugin is installed, it will fire a job listening for events
- * in the provided [WebSocketEventsConfiguration.channel].
+ * Supposed to be used in pair with [dev.d1s.ktor.events.server.route.webSocketEvents] route builder.
  *
  * Example usage:
  * ```kotlin
- * val eventChannel = WebSocketEventChannel()
+ * val pool = InMemoryEventPool()
  *
  * install(WebSocketEvents) {
- *     channel = eventChannel
+ *     eventPool = pool
  * }
  *
  * routing {
- *     webSockets()
+ *     webSocketEvents()
  * }
  *
  * val createdBook = createBook()
  * val reference = ref("book_created")
  * val event = event(reference, createdBook)
  *
- * eventChannel.send(event)
+ * pool.push(event)
  * ```
- * @see webSocketEvents
- * @see WebSocketEventChannel
  * @see WebSocketEventsConfiguration
+ * @see EventPool
  */
 public val WebSocketEvents: ApplicationPlugin<WebSocketEventsConfiguration> =
     createApplicationPlugin(WEBSOCKET_EVENTS_PLUGIN_NAME, ::WebSocketEventsConfiguration) {
@@ -61,33 +59,18 @@ public val WebSocketEvents: ApplicationPlugin<WebSocketEventsConfiguration> =
             "Installing WebSocketEvents plugin"
         }
 
-        val eventReceivingScope = pluginConfig.eventReceivingScope
-        val channel = pluginConfig.requiredChannel
-
         if (!application.hasWebSocketsPlugin()) {
             application.installWebSockets()
         }
 
-        val webSocketEventConsumer = webSocketEventConsumer().apply {
-            application.attributes.webSocketEventConsumer = this
-        }
-
-        webSocketEventConsumer.launch(eventReceivingScope, channel)
+        application.attributes.eventProcessor = DefaultEventProcessor()
+        application.attributes.eventPool = pluginConfig.eventPool ?: error("Event pool must be specified")
     }
 
 public class WebSocketEventsConfiguration {
 
-    public var channel: WebSocketEventChannel? = null
-
-    public var eventReceivingScope: CoroutineScope = defaultEventReceivingScope()
-
-    internal val requiredChannel
-        get() = requireNotNull(channel) {
-            "channel is not configured."
-        }
+    public var eventPool: EventPool? = null
 }
-
-private fun defaultEventReceivingScope() = CoroutineScope(Dispatchers.IO)
 
 private fun Application.hasWebSocketsPlugin() = pluginOrNull(WebSockets) != null
 

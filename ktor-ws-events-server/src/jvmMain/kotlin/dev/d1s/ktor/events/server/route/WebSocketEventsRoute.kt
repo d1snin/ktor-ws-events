@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package dev.d1s.ktor.events.server
+package dev.d1s.ktor.events.server.route
 
 import dev.d1s.ktor.events.commons.EventReference
 import dev.d1s.ktor.events.commons.util.Routes
+import dev.d1s.ktor.events.server.WebSocketEvents
+import dev.d1s.ktor.events.server.entity.EventSendingConnection
+import dev.d1s.ktor.events.server.util.eventProcessor
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
-import kotlinx.coroutines.channels.getOrElse
 import org.lighthousegames.logging.logging
 
 private val log = logging()
@@ -35,7 +37,10 @@ private val log = logging()
  * @throws IllegalStateException if the application does not have [WebSocketEvents] plugin installed.
  * @see WebSocketEvents
  */
-public fun Route.webSocketEvents(route: String = Routes.DEFAULT_EVENTS_ROUTE, preprocess: suspend DefaultWebSocketServerSession.(EventReference) -> Unit = {}) {
+public fun Route.webSocketEvents(
+    route: String = Routes.DEFAULT_EVENTS_ROUTE,
+    preprocess: suspend DefaultWebSocketServerSession.(EventReference) -> Unit = {}
+) {
     log.d {
         "Exposing route $route"
     }
@@ -46,7 +51,7 @@ public fun Route.webSocketEvents(route: String = Routes.DEFAULT_EVENTS_ROUTE, pr
 
     application.checkPluginInstalled()
 
-    val consumer = application.attributes.webSocketEventConsumer
+    val processor = application.attributes.eventProcessor
 
     webSocket(route) {
         log.d {
@@ -79,28 +84,23 @@ public fun Route.webSocketEvents(route: String = Routes.DEFAULT_EVENTS_ROUTE, pr
 
         preprocess(eventReference)
 
-        val connection = WebSocketEventSendingConnection(eventReference, this)
+        val connection = EventSendingConnection(eventReference, this, call)
+        processor.process(connection)
 
-        consumer.addConnection(connection)
-
-        var receiving = true
-
-        while (receiving) {
-            incoming.receiveCatching().getOrElse {
-                log.w {
-                    "Failed to receive"
-                }
-
-                it?.printStackTrace()
-
-                consumer.removeConnection(connection)
-
-                receiving = false
-            }
-        }
+        receive()
     }
 }
 
 private fun Application.checkPluginInstalled() {
     pluginOrNull(WebSocketEvents) ?: error("WebSocketEvents plugin is not installed on this application.")
+}
+
+private suspend fun DefaultWebSocketServerSession.receive() {
+    while (true) {
+        val data = incoming.receiveCatching().getOrNull()
+        data ?: log.d {
+            "Client connection lost"
+        }
+        data ?: break
+    }
 }

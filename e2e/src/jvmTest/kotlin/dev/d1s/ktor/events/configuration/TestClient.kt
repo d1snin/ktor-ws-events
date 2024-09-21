@@ -29,5 +29,6 @@ val webSocketClient = HttpClient(CIO) {
 
     install(WebSocketEvents) {
         url = "ws://localhost:$TEST_SERVER_PORT"
+        clientId = "test-client"
     }
 }

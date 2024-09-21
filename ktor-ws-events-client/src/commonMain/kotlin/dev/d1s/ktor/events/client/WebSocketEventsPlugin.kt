@@ -16,6 +16,7 @@
 
 package dev.d1s.ktor.events.client
 
+import dev.d1s.ktor.events.commons.randomId
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.api.*
@@ -32,7 +33,11 @@ public val WebSocketEvents: ClientPlugin<WebSocketEventsConfiguration> =
 
 public class WebSocketEventsConfiguration {
 
+    @Suppress("MemberVisibilityCanBePrivate")
     public var url: String? = null
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    public var clientId: String = randomId
 
     internal val requiredBaseUrl
         get() = requireNotNull(url) {

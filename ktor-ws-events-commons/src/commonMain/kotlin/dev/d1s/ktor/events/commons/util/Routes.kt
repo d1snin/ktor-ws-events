@@ -18,10 +18,13 @@ package dev.d1s.ktor.events.commons.util
 
 public object Routes {
 
+    public const val CLIENT_ID_HEADER: String = "X-Client-Id"
+
     public const val GROUP_PATH_PARAMETER: String = "group"
+
+    public const val PRINCIPAL_QUERY_PARAMETER: String = "principal"
+
     public const val GROUP_SEGMENT_PLACEHOLDER: String = "{${GROUP_PATH_PARAMETER}}"
 
     public const val DEFAULT_EVENTS_ROUTE: String = "/events/$GROUP_SEGMENT_PLACEHOLDER"
-
-    public const val PRINCIPAL_QUERY_PARAMETER: String = "principal"
 }

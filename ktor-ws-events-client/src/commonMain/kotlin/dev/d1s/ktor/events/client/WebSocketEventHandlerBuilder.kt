@@ -23,6 +23,9 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import org.lighthousegames.logging.logging
+
+private val logger = logging()
 
 /**
  * Opens a [block] with [DefaultClientWebSocketSession] associated with the given [event reference][reference] and optional [path].
@@ -59,6 +62,8 @@ public suspend fun HttpClient.webSocketEvents(
         }
 
         url.parameters.appendMissing(parameters)
+
+        header(Routes.CLIENT_ID_HEADER, webSocketEventsConfiguration.clientId)
     }
 
     val url = URLBuilder(webSocketEventsConfiguration.requiredBaseUrl).apply {
@@ -66,11 +71,21 @@ public suspend fun HttpClient.webSocketEvents(
         path(configuredPath)
     }.buildString()
 
-    webSocket(
-        urlString = url,
-        request = requestConfiguration,
-        block = block
-    )
+    logger.d {
+        "Will start WS session at $url"
+    }
+
+    withRetries(onError = {
+        logger.w {
+            "Error opening WS session: ${it.message}"
+        }
+    }) {
+        webSocket(
+            urlString = url,
+            request = requestConfiguration,
+            block = block
+        )
+    }
 }
 
 private fun HttpClient.checkPluginInstalled() {

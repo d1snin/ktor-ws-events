@@ -75,30 +75,15 @@ public data class EventReference(
 
         other as EventReference
 
-        if (group != other.group) return false
-
-        val otherPrincipal = other.principal
-
-        if (principal != null) {
-            return if (otherPrincipal != null) {
-                principal == otherPrincipal
-            } else {
-                false
-            }
-        }
-
-        return true
+        return group == other.group
     }
 
-    override fun hashCode(): Int {
-        var result = group.hashCode()
-        result = 31 * result + (principal?.hashCode() ?: 0)
-        return result
-    }
+    override fun hashCode(): Int =
+        group.hashCode()
 }
 
 /**
- * A shortcut. Returns `EventReference(group, principal, parameters)`
+ * A shortcut.
  *
  * @see EventReference
  * @see ClientParameters
@@ -107,4 +92,4 @@ public fun ref(
     group: EventGroup,
     principal: EventPrincipal = null,
     clientParameters: ClientParameters = mapOf()
-): EventReference = EventReference(group, principal, clientParameters)
+): EventReference = EventReference(group = group, principal = principal, parameters = clientParameters)

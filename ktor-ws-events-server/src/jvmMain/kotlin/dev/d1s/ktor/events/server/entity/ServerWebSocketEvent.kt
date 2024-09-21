@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package dev.d1s.ktor.events.server
+package dev.d1s.ktor.events.server.entity
 
-import dev.d1s.ktor.events.commons.ClientParameters
-import dev.d1s.ktor.events.commons.EventReference
+import dev.d1s.ktor.events.commons.*
+import java.time.Instant
 
 public typealias EventDataSupplier = suspend (ClientParameters) -> Any
 
@@ -36,14 +36,17 @@ public typealias EventDataSupplier = suspend (ClientParameters) -> Any
  * @see dev.d1s.ktor.events.commons.ref
  */
 public data class ServerWebSocketEvent(
-    val reference: EventReference,
-    val dataSupplier: EventDataSupplier
-)
+    override val id: Identifier = randomId,
+    override val reference: EventReference,
+    override val initiated: UnixTime = Instant.now().toEpochMilli(),
+    internal var acceptedByClients: List<Identifier> = listOf(),
+    internal val dataSupplier: EventDataSupplier
+) : AbstractEvent
 
 /**
- * A shortcut. Returns `ServerWebSocketEvent(reference, data)`
+ * A shortcut. Returns `ServerWebSocketEvent(reference, data)` currently initiated.
  *
  * @see ServerWebSocketEvent
  */
 public fun event(reference: EventReference, dataSupplier: EventDataSupplier): ServerWebSocketEvent =
-    ServerWebSocketEvent(reference, dataSupplier)
+    ServerWebSocketEvent(reference = reference, dataSupplier = dataSupplier)
