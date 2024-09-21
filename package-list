@@ -8,3 +8,6 @@ dev.d1s.ktor.events.commons
 dev.d1s.ktor.events.commons.util
 module:ktor-ws-events-server
 dev.d1s.ktor.events.server
+dev.d1s.ktor.events.server.entity
+dev.d1s.ktor.events.server.pool
+dev.d1s.ktor.events.server.route
