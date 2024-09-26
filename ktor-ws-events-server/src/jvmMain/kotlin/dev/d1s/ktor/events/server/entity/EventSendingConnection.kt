@@ -17,11 +17,14 @@
 package dev.d1s.ktor.events.server.entity
 
 import dev.d1s.ktor.events.commons.EventReference
+import dev.d1s.ktor.events.commons.Identifier
+import dev.d1s.ktor.events.server.util.clientId
 import io.ktor.server.application.*
-import io.ktor.websocket.*
+import io.ktor.server.websocket.*
 
 public data class EventSendingConnection(
     val reference: EventReference,
-    val session: DefaultWebSocketSession,
-    val call: ApplicationCall
+    val session: DefaultWebSocketServerSession,
+    val call: ApplicationCall = session.call,
+    val clientId: Identifier = call.clientId
 )

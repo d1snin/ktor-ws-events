@@ -17,6 +17,7 @@
 package dev.d1s.ktor.events.server.util
 
 import dev.d1s.ktor.events.server.EventProcessor
+import dev.d1s.ktor.events.server.OutgoingEventFilter
 import dev.d1s.ktor.events.server.WEBSOCKET_EVENTS_PLUGIN_NAME
 import dev.d1s.ktor.events.server.pool.EventPool
 import io.ktor.util.*
@@ -29,10 +30,20 @@ internal var Attributes.eventPool: EventPool
     get() = this[Key.EventPool]
     set(value) = this.put(Key.EventPool, value)
 
+internal var Attributes.filter: OutgoingEventFilter?
+    get() = this[Key.Filter]
+    set(value) {
+        value?.let {
+            this.put(Key.Filter, it)
+        }
+    }
+
 private object Key {
 
     val EventProcessor =
         AttributeKey<EventProcessor>("${WEBSOCKET_EVENTS_PLUGIN_NAME}_event-processor")
 
     val EventPool = AttributeKey<EventPool>("${WEBSOCKET_EVENTS_PLUGIN_NAME}_event-pool")
+
+    val Filter = AttributeKey<OutgoingEventFilter>("${WEBSOCKET_EVENTS_PLUGIN_NAME}_filter")
 }

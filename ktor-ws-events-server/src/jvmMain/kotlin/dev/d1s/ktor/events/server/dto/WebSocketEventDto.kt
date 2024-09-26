@@ -5,7 +5,10 @@ import dev.d1s.ktor.events.commons.EventReference
 import dev.d1s.ktor.events.commons.Identifier
 import dev.d1s.ktor.events.commons.UnixTime
 
-internal data class WebSocketEventDto(
+/**
+ * Outgoing event data
+ */
+public data class WebSocketEventDto(
     override val id: Identifier,
     override val reference: EventReference,
     override val initiated: UnixTime,

@@ -21,8 +21,8 @@ import dev.d1s.ktor.events.server.dto.WebSocketEventDto
 import dev.d1s.ktor.events.server.entity.EventSendingConnection
 import dev.d1s.ktor.events.server.entity.ServerWebSocketEvent
 import dev.d1s.ktor.events.server.pool.EventPool
-import dev.d1s.ktor.events.server.util.clientId
 import dev.d1s.ktor.events.server.util.eventPool
+import dev.d1s.ktor.events.server.util.filter
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -46,7 +46,8 @@ internal class DefaultEventProcessor : EventProcessor {
             val reference = connection.reference
             val call = connection.call
             val pool = call.application.attributes.eventPool
-            val client = call.clientId
+            val filter = call.application.attributes.filter
+            val client = connection.clientId
 
             log.d {
                 "Processing events for reference: $reference"
@@ -58,30 +59,32 @@ internal class DefaultEventProcessor : EventProcessor {
                 "Sending previously unreceived events: $unreceived"
             }
 
-            connection.sendAll(pool, client, unreceived)
+            connection.sendAll(pool, filter, client, unreceived)
 
             pool.onEvent(reference, client) {
                 log.d {
                     "Got event from event channel: $it"
                 }
 
-                connection.sendEvent(pool, client, it)
+                connection.sendEvent(pool, filter, client, it)
             }
         }
     }
 
     private suspend fun EventSendingConnection.sendAll(
         pool: EventPool,
+        filter: OutgoingEventFilter?,
         client: Identifier,
         events: List<ServerWebSocketEvent>
     ) {
         events.forEach {
-            sendEvent(pool, client, it)
+            sendEvent(pool, filter, client, it)
         }
     }
 
     private suspend fun EventSendingConnection.sendEvent(
         pool: EventPool,
+        filter: OutgoingEventFilter?,
         client: Identifier,
         event: ServerWebSocketEvent
     ) {
@@ -90,39 +93,36 @@ internal class DefaultEventProcessor : EventProcessor {
         }
 
         (session as? WebSocketServerSession)?.let { session ->
-            processSession(pool, client, session, event)
+            processEvent(pool, filter, client, session, event)
         }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private suspend fun EventSendingConnection.processSession(
+    private suspend fun EventSendingConnection.processEvent(
         pool: EventPool,
+        filter: OutgoingEventFilter?,
         client: Identifier,
         session: WebSocketServerSession,
         event: ServerWebSocketEvent
     ) {
         if (!session.outgoing.isClosedForSend) {
-            sendEventDto(session, event)
+            val dto = WebSocketEventDto(
+                id = event.id,
+                reference = reference,
+                initiated = event.initiated,
+                data = event.dataSupplier(reference.parameters)
+            )
 
-            pool.confirm(event.id, client)
+            val filterResolution = filter?.predicate(event, dto, this) ?: true
+
+            if (filterResolution) {
+                session.sendSerialized(dto)
+                pool.confirm(event.id, client)
+            }
         } else {
             log.d {
                 "Couldn't send event. Connection is closed."
             }
         }
-    }
-
-    private suspend fun EventSendingConnection.sendEventDto(
-        session: WebSocketServerSession,
-        event: ServerWebSocketEvent
-    ) {
-        val dto = WebSocketEventDto(
-            id = event.id,
-            reference = reference,
-            initiated = event.initiated,
-            data = event.dataSupplier(reference.parameters)
-        )
-
-        session.sendSerialized(dto)
     }
 }

@@ -84,7 +84,7 @@ public fun Route.webSocketEvents(
 
         preprocess(eventReference)
 
-        val connection = EventSendingConnection(eventReference, this, call)
+        val connection = EventSendingConnection(eventReference, this)
         processor.process(connection)
 
         receive()

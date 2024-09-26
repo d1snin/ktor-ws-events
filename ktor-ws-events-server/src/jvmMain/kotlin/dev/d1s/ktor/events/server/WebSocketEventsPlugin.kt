@@ -19,6 +19,7 @@ package dev.d1s.ktor.events.server
 import dev.d1s.ktor.events.server.pool.EventPool
 import dev.d1s.ktor.events.server.util.eventPool
 import dev.d1s.ktor.events.server.util.eventProcessor
+import dev.d1s.ktor.events.server.util.filter
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.websocket.*
@@ -65,11 +66,14 @@ public val WebSocketEvents: ApplicationPlugin<WebSocketEventsConfiguration> =
 
         application.attributes.eventProcessor = DefaultEventProcessor()
         application.attributes.eventPool = pluginConfig.eventPool ?: error("Event pool must be specified")
+        application.attributes.filter = pluginConfig.filter
     }
 
 public class WebSocketEventsConfiguration {
 
     public var eventPool: EventPool? = null
+
+    public var filter: OutgoingEventFilter? = null
 }
 
 private fun Application.hasWebSocketsPlugin() = pluginOrNull(WebSockets) != null
