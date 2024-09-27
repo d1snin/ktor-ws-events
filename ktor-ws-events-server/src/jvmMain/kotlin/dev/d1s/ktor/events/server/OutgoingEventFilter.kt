@@ -10,7 +10,7 @@ import dev.d1s.ktor.events.server.entity.ServerWebSocketEvent
  */
 public fun interface OutgoingEventFilter {
 
-    public fun predicate(
+    public suspend fun predicate(
         event: ServerWebSocketEvent,
         dto: WebSocketEventDto,
         connection: EventSendingConnection
