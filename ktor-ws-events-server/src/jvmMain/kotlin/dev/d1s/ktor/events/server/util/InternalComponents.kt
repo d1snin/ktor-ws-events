@@ -31,7 +31,7 @@ internal var Attributes.eventPool: EventPool
     set(value) = this.put(Key.EventPool, value)
 
 internal var Attributes.filter: OutgoingEventFilter?
-    get() = this[Key.Filter]
+    get() = this.getOrNull(Key.Filter)
     set(value) {
         value?.let {
             this.put(Key.Filter, it)
