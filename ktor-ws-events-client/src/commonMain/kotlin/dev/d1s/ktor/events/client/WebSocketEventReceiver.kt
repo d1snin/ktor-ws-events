@@ -46,6 +46,8 @@ public suspend inline fun <reified T> DefaultClientWebSocketSession.receiveWebSo
         withRetries(continuous = true, onError = {
             EventReceiverLog.w {
                 "Error receiving web socket events: ${it.message}"
+
+                it.printStackTrace()
             }
         }) {
             val event = receiveWebSocketEvent<T>()

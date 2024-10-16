@@ -78,6 +78,8 @@ public suspend fun HttpClient.webSocketEvents(
     withRetries(onError = {
         logger.w {
             "Error opening WS session: ${it.message}"
+
+            it.printStackTrace()
         }
     }) {
         webSocket(
