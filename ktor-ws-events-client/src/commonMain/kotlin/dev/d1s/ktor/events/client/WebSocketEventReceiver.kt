@@ -17,14 +17,8 @@
 package dev.d1s.ktor.events.client
 
 import io.ktor.client.plugins.websocket.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import org.lighthousegames.logging.KmLog
 import org.lighthousegames.logging.logging
-
-public val EventReceivingScope: CoroutineScope = CoroutineScope(Dispatchers.Default)
 
 public val EventReceiverLog: KmLog = logging()
 
@@ -41,16 +35,15 @@ public suspend inline fun <reified T> DefaultClientWebSocketSession.receiveWebSo
  *
  * @see webSocketEvents
  */
-public inline fun <reified T> DefaultClientWebSocketSession.receiveWebSocketEvents(crossinline receiver: suspend (ClientWebSocketEvent<T>) -> Unit): Job =
-    EventReceivingScope.launch {
-        withRetries(continuous = true, onError = {
-            EventReceiverLog.w {
-                "Error receiving web socket events: ${it.message}"
+public suspend inline fun <reified T> DefaultClientWebSocketSession.receiveWebSocketEvents(crossinline receiver: suspend (ClientWebSocketEvent<T>) -> Unit) {
+    withRetries(continuous = true, onError = {
+        EventReceiverLog.w {
+            "Error receiving web socket events: ${it.message}"
 
-                it.printStackTrace()
-            }
-        }) {
-            val event = receiveWebSocketEvent<T>()
-            receiver(event)
+            it.printStackTrace()
         }
+    }) {
+        val event = receiveWebSocketEvent<T>()
+        receiver(event)
     }
+}
