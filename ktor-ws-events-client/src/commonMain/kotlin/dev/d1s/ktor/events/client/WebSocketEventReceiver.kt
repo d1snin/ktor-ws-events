@@ -41,7 +41,7 @@ public suspend inline fun <reified T> DefaultClientWebSocketSession.receiveWebSo
  *
  * @see webSocketEvents
  */
-public suspend inline fun <reified T> DefaultClientWebSocketSession.receiveWebSocketEvents(crossinline receiver: suspend (ClientWebSocketEvent<T>) -> Unit): Job =
+public inline fun <reified T> DefaultClientWebSocketSession.receiveWebSocketEvents(crossinline receiver: suspend (ClientWebSocketEvent<T>) -> Unit): Job =
     EventReceivingScope.launch {
         withRetries(continuous = true, onError = {
             EventReceiverLog.w {
