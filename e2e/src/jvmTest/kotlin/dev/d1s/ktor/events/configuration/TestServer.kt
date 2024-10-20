@@ -28,10 +28,15 @@ const val TEST_SERVER_PORT = 20324
 
 val pool = InMemoryEventPool()
 
-fun runTestServer() = embeddedServer(Netty, environment).start()
-
-private val environment = applicationEngineEnvironment {
-    module {
+fun runTestServer() = embeddedServer(
+    Netty,
+    applicationEnvironment(),
+    configure = {
+        connector {
+            port = TEST_SERVER_PORT
+        }
+    },
+    module = {
         install(WebSocketEvents) {
             eventPool = pool
         }
@@ -40,8 +45,4 @@ private val environment = applicationEngineEnvironment {
             webSocketEvents()
         }
     }
-
-    connector {
-        port = TEST_SERVER_PORT
-    }
-}
+).start()
