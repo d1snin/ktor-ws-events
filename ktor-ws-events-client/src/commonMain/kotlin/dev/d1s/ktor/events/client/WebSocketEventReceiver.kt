@@ -17,7 +17,6 @@
 package dev.d1s.ktor.events.client
 
 import io.ktor.client.plugins.websocket.*
-import kotlinx.coroutines.coroutineScope
 import org.lighthousegames.logging.KmLog
 import org.lighthousegames.logging.logging
 
@@ -37,10 +36,8 @@ public suspend inline fun <reified T> DefaultClientWebSocketSession.receiveWebSo
  * @see webSocketEvents
  */
 public suspend inline fun <reified T> DefaultClientWebSocketSession.receiveWebSocketEvents(crossinline receiver: suspend (ClientWebSocketEvent<T>) -> Unit) {
-    coroutineScope {
-        while (true) {
-            val event = receiveWebSocketEvent<T>()
-            receiver(event)
-        }
+    while (true) {
+        val event = receiveWebSocketEvent<T>()
+        receiver(event)
     }
 }
