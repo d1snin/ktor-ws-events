@@ -10,6 +10,7 @@ private val logger = logging()
 
 public suspend fun <R> withRetries(
     continuous: Boolean = false,
+    delay: Long = DEFAULT_DELAY,
     onError: suspend (Throwable) -> Unit = {},
     block: suspend () -> R
 ) {
@@ -28,7 +29,7 @@ public suspend fun <R> withRetries(
 
                 onError(e)
 
-                delay(DEFAULT_DELAY)
+                delay(delay)
             }
         }
     }

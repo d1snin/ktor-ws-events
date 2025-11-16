@@ -75,13 +75,17 @@ public suspend fun HttpClient.webSocketEvents(
         "Will start WS session at $url"
     }
 
-    withRetries(onError = {
-        logger.w {
-            "Error handling WS session: ${it.message}"
-        }
+    withRetries(
+        continuous = true,
+        delay = 300,
+        onError = {
+            logger.w {
+                "Error handling WS session: ${it.message}"
+            }
 
-        it.printStackTrace()
-    }) {
+            it.printStackTrace()
+        }
+    ) {
         webSocket(
             urlString = url,
             request = requestConfiguration,
