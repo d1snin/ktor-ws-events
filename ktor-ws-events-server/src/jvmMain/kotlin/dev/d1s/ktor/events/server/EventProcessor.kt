@@ -27,6 +27,7 @@ import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.lighthousegames.logging.logging
 
@@ -39,7 +40,7 @@ internal class DefaultEventProcessor : EventProcessor {
 
     private val log = logging()
 
-    private val eventProcessorScope = CoroutineScope(Dispatchers.Default)
+    private val eventProcessorScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     override fun process(connection: EventSendingConnection) {
         eventProcessorScope.launch {

@@ -5,6 +5,7 @@ import dev.d1s.ktor.events.commons.Identifier
 import dev.d1s.ktor.events.server.entity.ServerWebSocketEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.lighthousegames.logging.logging
@@ -38,7 +39,7 @@ public class InMemoryEventPool(
     private val eventMap = ConcurrentHashMap<EventReference, CopyOnWriteArrayList<ServerWebSocketEvent>>()
     private val handlerMap = ConcurrentHashMap<EventReference, MutableList<suspend (ServerWebSocketEvent) -> Unit>>()
 
-    private val gcScope = CoroutineScope(Dispatchers.Default)
+    private val gcScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     private val log = logging()
 
