@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-apply {
-    val publishingScript: String by project
-
-    from(publishingScript)
-}
+apply(from = rootProject.file("publishing.gradle.kts"))
 
 kotlin {
-    jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = JavaVersion.VERSION_17.majorVersion
-        }
-    }
+    jvm()
 
     sourceSets {
-        val jvmMain by getting {
+        jvmMain {
             dependencies {
-                val kmLogVersion: String by project
+                val kmLogVersion = providers.gradleProperty("kmLogVersion").get()
 
-                val ktorVersion: String by project
+                val ktorVersion = providers.gradleProperty("ktorVersion").get()
 
                 implementation("org.lighthousegames:logging:$kmLogVersion")
 

@@ -15,19 +15,15 @@
  */
 
 kotlin {
-    jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = JavaVersion.VERSION_17.majorVersion
-        }
-    }
+    jvm()
 
     sourceSets {
-        val jvmTest by getting {
+        jvmTest {
             dependencies {
-                val ktorVersion: String by project
+                val ktorVersion = providers.gradleProperty("ktorVersion").get()
 
-                val kmLogVersion: String by project
-                val logbackVersion: String by project
+                val kmLogVersion = providers.gradleProperty("kmLogVersion").get()
+                val logbackVersion = providers.gradleProperty("logbackVersion").get()
 
                 implementation("org.lighthousegames:logging:$kmLogVersion")
                 implementation("ch.qos.logback:logback-classic:$logbackVersion")
@@ -45,5 +41,6 @@ kotlin {
         }
     }
 }
+
 
 

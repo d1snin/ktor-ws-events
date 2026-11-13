@@ -18,33 +18,24 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-apply {
-    val publishingScript: String by project
-
-    from(publishingScript)
-}
-
+apply(from = rootProject.file("publishing.gradle.kts"))
 
 kotlin {
-    jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = JavaVersion.VERSION_17.majorVersion
-        }
-    }
+    jvm()
 
-    js(IR) {
+    js {
         browser()
         nodejs()
     }
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
-                val kmLogVersion: String by project
+                val kmLogVersion = providers.gradleProperty("kmLogVersion").get()
 
-                val ktorVersion: String by project
+                val ktorVersion = providers.gradleProperty("ktorVersion").get()
 
-                val kotlinxSerializationVersion: String by project
+                val kotlinxSerializationVersion = providers.gradleProperty("kotlinxSerializationVersion").get()
 
                 api(project(":ktor-ws-events-commons"))
 

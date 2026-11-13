@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
+// Kotlin Multiplatform creates the publications itself; 'java'/'java-library'
+// must not be applied next to it (rejected by KGP 2.x).
 apply {
-    plugin("java-library")
     plugin("maven-publish")
 }
 

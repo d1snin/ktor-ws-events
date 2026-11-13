@@ -18,19 +18,23 @@ rootProject.name = "ktor-ws-events"
 
 pluginManagement {
     plugins {
-        val kotlinVersion: String by settings
+        val kotlinVersion = providers.gradleProperty("kotlinVersion").get()
 
-        val dokkaVersion: String by settings
+        val dokkaVersion = providers.gradleProperty("dokkaVersion").get()
 
-        val versionsPluginVersion: String by settings
+        val versionsPluginVersion = providers.gradleProperty("versionsPluginVersion").get()
 
         kotlin("multiplatform") version kotlinVersion
         kotlin("plugin.serialization") version kotlinVersion
 
         id("org.jetbrains.dokka") version dokkaVersion
 
-        id("com.github.ben-manes.versions") version versionsPluginVersion
+        id("io.github.ben-manes.versions") version versionsPluginVersion
     }
+}
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 include(

@@ -15,45 +15,38 @@
  */
 
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.jetbrains.dokka.base.DokkaBase
-import org.jetbrains.dokka.base.DokkaBaseConfiguration
-import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
-import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import org.jetbrains.dokka.gradle.DokkaExtension
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
-    kotlin("multiplatform")
+    kotlin("multiplatform") apply false
     id("org.jetbrains.dokka")
-    id("com.github.ben-manes.versions")
+    id("io.github.ben-manes.versions")
 }
 
-buildscript {
-    dependencies {
-        val dokkaVersion: String by project
+val javaToolchainVersion = 25
+val jvmBytecodeTarget = JvmTarget.JVM_17
 
-        classpath("org.jetbrains.dokka:dokka-base:$dokkaVersion")
-    }
-}
+val dokkaFooterMessage = "Copyright (c) 2022-2023 Mikhail Titov"
+val dokkaExcludedModules = listOf("e2e")
 
 allprojects {
-    ext {
-        set("publishingScript", "${rootProject.projectDir.absolutePath}/publishing.gradle.kts")
-    }
-
-    apply {
-        plugin("org.jetbrains.kotlin.multiplatform")
-    }
-
-    val projectGroup: String by project
-    val projectVersion: String by project
-
-    group = projectGroup
-    version = projectVersion
+    group = providers.gradleProperty("projectGroup").get()
+    version = providers.gradleProperty("projectVersion").get()
 
     repositories {
         mavenCentral()
     }
+}
 
-    tasks.withType<Test> {
+subprojects {
+    apply {
+        plugin("org.jetbrains.kotlin.multiplatform")
+    }
+
+    tasks.withType<Test>().configureEach {
         testLogging {
             events.addAll(
                 listOf(
@@ -67,52 +60,53 @@ allprojects {
         }
     }
 
-    val dokkaExcludedModules = listOf("e2e")
+    // Built with JDK 25, but the published bytecode and the JDK API surface stay at 17.
+    tasks.withType<KotlinJvmCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(jvmBytecodeTarget)
+            freeCompilerArgs.add("-Xjdk-release=${jvmBytecodeTarget.target}")
+        }
+    }
+
+    tasks.withType<JavaCompile>().configureEach {
+        options.release.set(jvmBytecodeTarget.target.toInt())
+    }
 
     if (project.name !in dokkaExcludedModules) {
         apply {
             plugin("org.jetbrains.dokka")
         }
 
-        tasks.withType<DokkaTaskPartial> {
-            dokkaSourceSets {
-                configureEach {
-                    val moduleDocsPath: String by project
-
-                    includes.setFrom(moduleDocsPath)
-                }
+        configure<DokkaExtension> {
+            dokkaSourceSets.configureEach {
+                includes.from(providers.gradleProperty("moduleDocsPath"))
             }
 
-            pluginConfiguration()
+            pluginsConfiguration.html {
+                footerMessage.set(dokkaFooterMessage)
+            }
         }
     }
 
-    kotlin {
+    configure<KotlinMultiplatformExtension> {
         explicitApi()
+
+        jvmToolchain(javaToolchainVersion)
     }
 }
 
-kotlin {
-    jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = JavaVersion.VERSION_17.majorVersion
-        }
-    }
-
-    js(IR) {
-        browser()
-        nodejs()
-    }
+dependencies {
+    subprojects
+        .filter { it.name !in dokkaExcludedModules }
+        .forEach { dokka(project(it.path)) }
 }
 
-tasks.withType<DokkaMultiModuleTask> {
-    includes.setFrom("README.md")
+dokka {
+    dokkaPublications.html {
+        includes.from("README.md")
+    }
 
-    pluginConfiguration()
-}
-
-fun org.jetbrains.dokka.gradle.AbstractDokkaTask.pluginConfiguration() {
-    pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
-        footerMessage = "Copyright (c) 2022-2023 Mikhail Titov"
+    pluginsConfiguration.html {
+        footerMessage.set(dokkaFooterMessage)
     }
 }
