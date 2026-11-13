@@ -31,7 +31,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
-import org.lighthousegames.logging.logging
+import com.diamondedge.logging.logging
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

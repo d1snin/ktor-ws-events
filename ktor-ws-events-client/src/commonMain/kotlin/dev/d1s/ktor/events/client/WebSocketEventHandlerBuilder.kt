@@ -23,7 +23,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import org.lighthousegames.logging.logging
+import com.diamondedge.logging.logging
 
 private val logger = logging()
 

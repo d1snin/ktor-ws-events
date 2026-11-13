@@ -17,8 +17,8 @@
 package dev.d1s.ktor.events.client
 
 import io.ktor.client.plugins.websocket.*
-import org.lighthousegames.logging.KmLog
-import org.lighthousegames.logging.logging
+import com.diamondedge.logging.KmLog
+import com.diamondedge.logging.logging
 
 public val EventReceiverLog: KmLog = logging()
 

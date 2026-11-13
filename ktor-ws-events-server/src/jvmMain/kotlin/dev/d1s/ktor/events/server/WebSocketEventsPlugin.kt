@@ -23,7 +23,7 @@ import dev.d1s.ktor.events.server.util.filter
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.websocket.*
-import org.lighthousegames.logging.logging
+import com.diamondedge.logging.logging
 
 internal const val WEBSOCKET_EVENTS_PLUGIN_NAME = "websocket-events"
 

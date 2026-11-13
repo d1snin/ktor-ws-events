@@ -9,7 +9,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.lighthousegames.logging.logging
+import com.diamondedge.logging.logging
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList

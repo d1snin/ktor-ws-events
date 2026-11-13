@@ -26,7 +26,7 @@ kotlin {
 
                 val ktorVersion = providers.gradleProperty("ktorVersion").get()
 
-                implementation("org.lighthousegames:logging:$kmLogVersion")
+                implementation("com.diamondedge:logging:$kmLogVersion")
 
                 api(project(":ktor-ws-events-commons"))
 

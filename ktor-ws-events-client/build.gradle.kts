@@ -39,7 +39,7 @@ kotlin {
 
                 api(project(":ktor-ws-events-commons"))
 
-                implementation("org.lighthousegames:logging:$kmLogVersion")
+                implementation("com.diamondedge:logging:$kmLogVersion")
 
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
                 implementation("io.ktor:ktor-client-websockets:$ktorVersion")

@@ -2,7 +2,7 @@ package dev.d1s.ktor.events.client
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import org.lighthousegames.logging.logging
+import com.diamondedge.logging.logging
 
 private const val DEFAULT_DELAY = 5_000L
 

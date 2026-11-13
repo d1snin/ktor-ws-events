@@ -24,7 +24,7 @@ import dev.d1s.ktor.events.server.util.eventProcessor
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
-import org.lighthousegames.logging.logging
+import com.diamondedge.logging.logging
 
 private val log = logging()
 

@@ -29,7 +29,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import org.lighthousegames.logging.logging
+import com.diamondedge.logging.logging
 
 internal interface EventProcessor {
 

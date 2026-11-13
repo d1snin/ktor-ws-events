@@ -27,7 +27,7 @@ kotlin {
                 val kmLogVersion = providers.gradleProperty("kmLogVersion").get()
                 val logbackVersion = providers.gradleProperty("logbackVersion").get()
 
-                implementation("org.lighthousegames:logging:$kmLogVersion")
+                implementation("com.diamondedge:logging:$kmLogVersion")
                 implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
                 implementation(project(":ktor-ws-events-server"))
