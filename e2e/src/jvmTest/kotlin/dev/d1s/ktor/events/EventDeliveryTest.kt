@@ -19,66 +19,94 @@ package dev.d1s.ktor.events
 import dev.d1s.ktor.events.client.ClientWebSocketEvent
 import dev.d1s.ktor.events.client.receiveWebSocketEvent
 import dev.d1s.ktor.events.client.webSocketEvents
+import dev.d1s.ktor.events.commons.ClientParameters
 import dev.d1s.ktor.events.configuration.pool
 import dev.d1s.ktor.events.configuration.runTestServer
 import dev.d1s.ktor.events.configuration.webSocketClient
 import dev.d1s.ktor.events.server.entity.event
+import io.ktor.server.engine.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.lighthousegames.logging.logging
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
+
+private const val EVENT_DELIVERY_TIMEOUT = 30_000L
 
 class EventDeliveryTest {
 
     private val log = logging()
 
+    private lateinit var server: EmbeddedServer<*, *>
+
     @BeforeTest
     fun prepareServer() {
-        runTestServer()
+        server = runTestServer()
+    }
+
+    @AfterTest
+    fun stopServer() {
+        server.stop()
     }
 
     @Test
     fun `server must deliver an event`() {
         runBlocking {
-            launch {
-                listenForTestEvent { event ->
+            val receivedEvent = CompletableDeferred<ClientWebSocketEvent<TestEventData>>()
+            val receivedParameters = CompletableDeferred<ClientParameters>()
+
+            // webSocketEvents() reconnects forever (even after the block returns),
+            // so the listener has to be cancelled explicitly once the event arrives.
+            // Assertions are made outside the block: errors thrown inside it are
+            // swallowed by the client's retry loop.
+            val listener = launch {
+                webSocketClient.webSocketEvents(testClientEventReference) {
+                    val event = receiveWebSocketEvent<TestEventData>()
+
                     log.i {
                         "Received test event: $event"
                     }
 
-                    assertEquals(event.reference, testServerEventReference)
-                    assertEquals(testEventData.message, event.data.message)
+                    receivedEvent.complete(event)
                 }
             }
 
-            delay(1_000)
+            try {
+                delay(1_000)
 
-            sendTestEvent()
+                sendTestEvent(receivedParameters)
+
+                val event = withTimeout(EVENT_DELIVERY_TIMEOUT) {
+                    receivedEvent.await()
+                }
+
+                assertEquals(testServerEventReference, event.reference)
+                assertEquals(testEventData.message, event.data.message)
+
+                val parameters = withTimeout(EVENT_DELIVERY_TIMEOUT) {
+                    receivedParameters.await()
+                }
+
+                assertEquals(TEST_CLIENT_PARAMETER_DATA, parameters[TEST_CLIENT_PARAMETER_KEY])
+            } finally {
+                listener.cancelAndJoin()
+            }
         }
     }
 
-    private suspend fun listenForTestEvent(block: (ClientWebSocketEvent<TestEventData>) -> Unit) {
-        webSocketClient.webSocketEvents(testClientEventReference) {
-            val event = receiveWebSocketEvent<TestEventData>()
-
-            block(event)
-        }
-    }
-
-    private suspend fun sendTestEvent() {
+    private suspend fun sendTestEvent(receivedParameters: CompletableDeferred<ClientParameters>) {
         val event = event(testServerEventReference) { parameters ->
             log.i {
                 "Got parameters: $parameters"
             }
 
-            val testParameterData = parameters[TEST_CLIENT_PARAMETER_KEY]
-
-            assertNotNull(testParameterData)
-            assertEquals(TEST_CLIENT_PARAMETER_DATA, testParameterData)
+            receivedParameters.complete(parameters)
 
             testEventData
         }

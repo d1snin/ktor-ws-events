@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import java.time.Duration
+
 kotlin {
     jvm()
 
@@ -44,3 +46,7 @@ kotlin {
 
 
 
+// The client reconnects forever by design, so a broken test must not be able to hang CI.
+tasks.withType<Test>().configureEach {
+    timeout.set(Duration.ofMinutes(5))
+}
