@@ -21,6 +21,9 @@ import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.api.*
 import io.ktor.client.plugins.websocket.*
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 public val WebSocketEvents: ClientPlugin<WebSocketEventsConfiguration> =
     createClientPlugin("websocket-events", ::WebSocketEventsConfiguration) {
@@ -39,6 +42,23 @@ public class WebSocketEventsConfiguration {
     @Suppress("MemberVisibilityCanBePrivate")
     public var clientId: String = randomId
 
+    /**
+     * Delay before the first reconnect of a dropped or refused session. Each
+     * further consecutive failure doubles it (with jitter) up to [reconnectMaxDelay].
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    public var reconnectInitialDelay: Duration = 500.milliseconds
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    public var reconnectMaxDelay: Duration = 30.seconds
+
+    /**
+     * A session that stayed open at least this long counts as healthy: the
+     * backoff starts over from [reconnectInitialDelay] after it ends.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    public var stableSessionDuration: Duration = 30.seconds
+
     internal val requiredBaseUrl
         get() = requireNotNull(url) {
             "URL is not configured."
@@ -46,6 +66,8 @@ public class WebSocketEventsConfiguration {
 
     internal fun validate() {
         requiredBaseUrl
+
+        ReconnectBackoff(reconnectInitialDelay, reconnectMaxDelay)
     }
 }
 

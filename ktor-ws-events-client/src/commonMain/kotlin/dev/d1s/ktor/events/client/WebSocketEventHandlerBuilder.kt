@@ -24,6 +24,12 @@ import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import com.diamondedge.logging.logging
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 private val logger = logging()
 
@@ -75,24 +81,92 @@ public suspend fun HttpClient.webSocketEvents(
         "Will start WS session at $url"
     }
 
-    withRetries(
-        continuous = true,
-        delay = 300,
-        onError = {
-            logger.w {
-                "Error handling WS session: ${it::class.simpleName} ${it.message}"
-            }
-
-            it.printStackTrace()
-        }
-    ) {
+    reconnecting(url, webSocketEventsConfiguration) { onConnected ->
         webSocket(
             urlString = url,
-            request = requestConfiguration,
-            block = block
-        )
+            request = requestConfiguration
+        ) {
+            onConnected()
+            block()
+        }
     }
 }
+
+/**
+ * Runs [session] forever, reconnecting after it fails or ends with an
+ * exponential, jittered backoff (see [ReconnectBackoff]). The backoff starts
+ * over after a session that stayed open for
+ * [WebSocketEventsConfiguration.stableSessionDuration]. A failure streak is
+ * logged at WARN on its first attempt and every [WARN_EVERY_ATTEMPTS] attempts
+ * after that (stack traces at DEBUG only), and its end at INFO.
+ */
+private suspend fun reconnecting(
+    url: String,
+    configuration: WebSocketEventsConfiguration,
+    session: suspend (onConnected: () -> Unit) -> Unit
+) {
+    val backoff = ReconnectBackoff(configuration.reconnectInitialDelay, configuration.reconnectMaxDelay)
+
+    while (true) {
+        var connectedAt: TimeMark? = null
+
+        val error = try {
+            session {
+                connectedAt = TimeSource.Monotonic.markNow()
+
+                if (backoff.attempts > 0) {
+                    logger.i {
+                        "WS session at $url re-established after ${backoff.attempts} reconnect attempt(s)"
+                    }
+                }
+            }
+
+            null
+        } catch (e: CancellationException) {
+            // a real cancellation of the listener stops it; anything else
+            // shaped like one (a closed session) is a plain failure
+            if (!currentCoroutineContext().isActive) throw e
+
+            e
+        } catch (e: Throwable) {
+            e
+        }
+
+        val lasted = connectedAt?.elapsedNow()
+
+        if (lasted != null && lasted >= configuration.stableSessionDuration) {
+            backoff.reset()
+        }
+
+        val wait = backoff.next()
+        val attempt = backoff.attempts
+        val reason = error?.let { "${it::class.simpleName}: ${it.message}" } ?: "closed by the server"
+
+        if (attempt == 1 || attempt % WARN_EVERY_ATTEMPTS == 0) {
+            logger.w {
+                if (attempt == 1) {
+                    "WS session at $url ended ($reason); reconnecting in $wait"
+                } else {
+                    "WS session at $url still down after $attempt attempts ($reason); next attempt in $wait"
+                }
+            }
+        } else {
+            logger.d {
+                "WS session at $url attempt $attempt failed ($reason); next attempt in $wait"
+            }
+        }
+
+        if (error != null) {
+            logger.d {
+                error.stackTraceToString()
+            }
+        }
+
+        delay(wait)
+    }
+}
+
+private const val WARN_EVERY_ATTEMPTS = 20
 
 private fun HttpClient.checkPluginInstalled() {
     pluginOrNull(WebSocketEvents) ?: error("WebSocketEvents plugin is not installed.")
